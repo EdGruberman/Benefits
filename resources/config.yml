@@ -1,0 +1,109 @@
+logLevel: INFO
+coordinator:
+    period: 60 # seconds
+    pending: pending.yml
+    incoming: incoming/
+    processed: processed/
+messages:
+    requiresArgument: '-> Required §cargument missing§r: %2$s' # 2 = Name
+    unknownArgument: '-> §cUnable to determine %2$s§r: %3$s' # 2 = Name, 3 = Value
+    reload: '-> Donations plugin §2reloaded'
+    history:
+        none: '-> No donation history found for %2$s' # 2 = <Player>
+        donation: '-> %2$tY %2$tb %2$td %2$tI:%2$tM%2$tp (%3$dd) = §a$%4$.2f§r [%5$s]' # 2 = Contributed, 3 = Days Since Contributed, 4 = Amount (USD), 5 = Packages
+        packages:
+            +item: '%1$s' # 1 = Package
+            +delim: ', '
+        summary: # 2 = Donator, 3 = Oldest (Days), 4 = Newest (Days), 5 = Current Page, 6 = Page Count, 7 = Donation Count, 8 = Donation Sum
+            - '-> %2$s last %4$d days | %7$d total (First %3$d days)'
+            - '-> Page %5$d of %6$d'
+    benefits:
+        none: '-> No benefits found'
+        package: '-> %2$s: §a$%4$.2f+§r = %3$s%5$s' # 2 = Package, 3 = Description, 4 = Minimum, 5 = Limit
+        +limit: ' (§e%1$dd limit§r)' # 1 = Limit (Days)
+        instruction: 'To list specifics: /benefits "<Package>" (e.g. §5/benefits Donor§r)'
+        benefit: '-> %2$s: %3$s = %4$s' # 2 = Package, 3 = Benefit, 4 = Description
+    process:
+        success: # 2 = Donator, 3 = Amount, 4 = Packages
+            - '-> Donation of §a$%3$.2f §2processed§r for %2$s'
+            - '-> Packages applied: %4$s'
+        packages:
+            +item: '%1$s' # 1 = Package
+            +delim: ', '
+    remove:
+        success: # 2 = Donator, 3 = Amount, 4 = Contributed, 5 = Commands
+            - '-> Removed commands from donation of §a$%3$.2f§r from %2$s on %4$tY %4$tb %4$td %4$tI:%4$tM%4$tp'
+            - '-> Commands removed: %5$s'
+        commands:
+            +item: '%1$s' # 1 = Command
+            +delim: ', '
+packages:
+    Donor:
+        description: Recognition for server support
+        minimum: 0.01
+        limit: 0
+        benefits:
+            Confirmation:
+                description: Notification regarding a received donation
+                commands:
+                    Message:
+                        triggers: [Online]
+                        dispatch:
+                            - 'send %1$s §2§k####§r Thank you for your §a$%2$.2f USD donation!'
+                            - 'send %1$s §2§k####§r It is donators such as yourself that keep this server running'
+                            - 'send %1$s §2§k####§r You now have access to chat colors (§5/help colors§r for details)'
+                    Expire:
+                        triggers: [Delay,Quit]
+                        delay: 30 # 2592000 # Seconds (30 days)
+                        tolerance: 5 # 43200 # Seconds (12 hours)
+                        dispatch: 'donations.remove %4$s Donor Confirmation'
+            Chat Color Codes:
+                description: Ability to use color codes in chat
+                commands:
+                    Add:
+                        triggers: [Instant]
+                        dispatch: 'accesscontrol:set messageformatter.colors true %1$s +user'
+                    Expire:
+                        triggers: [Delay]
+                        delay: 2592000
+                        tolerance: 30
+                        dispatch: 'accesscontrol:unset messageformatter.colors %1$s'
+    Supporter:
+        description: Slot priority, custom channels
+        minimum: 10.00
+        limit: 30 # days
+        benefits:
+            Slot Priority:
+                description: Reserved donor slot access
+                commands:
+                    Add:
+                        triggers: [Instant]
+                        dispatch: 'accesscontrol:set donations.benefit.slotpriority true %1$s +user'
+                    Expire:
+                        triggers: [Delay]
+                        delay: 2592000
+                        tolerance: 30
+                        dispatch: 'accesscontrol:unset donations.benefit.slotpriority %1$s'
+            Chat Name Color:
+                description: Colored name in chat
+                commands:
+                    Add:
+                        triggers: [Instant]
+                        dispatch: 'nick color set %1$s LIGHT_GREEN'
+                    Expire:
+                        triggers: [Delay]
+                        delay: 2592000
+                        tolerance: 30
+                        dispatch: 'nick color clear %1$s'
+            Chat Channel Creation:
+                description: Ability to create chat channels
+                commands:
+                    Add:
+                        triggers: [Instant]
+                        dispatch: 'accesscontrol:set messageformatter.channel.create true %1$s +user'
+                    Expire:
+                        triggers: [Delay]
+                        delay: 2592000
+                        tolerance: 30
+                        dispatch: 'accesscontrol:unset messageformatter.channel.create %1$s'
+version: @VERSION@

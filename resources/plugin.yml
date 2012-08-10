@@ -1,0 +1,46 @@
+name: @NAME@
+description: Manages donation benefits
+softdepend: [MessageManager]
+version: @VERSION@
+author: @AUTHOR@
+main: @MAIN@
+commands:
+    'donations:history':
+        aliases: [donations, history, donations.history]
+        description: Show donation history
+        permission: donations.history
+        usage: /<command>[ <Page>][ <Donator>]
+    'donations:benefits':
+        aliases: [benefits, donations.benefits]
+        description: Show package/benefit detail
+        permission: donations.benefits
+        usage: /<command>[ <Package>]
+    'donations:process':
+        aliases: [donations.process]
+        description: Process a donation
+        permission: donations.process
+        usage: /<command> <Donator> <Amount>[ <When>]
+    'donations:remove':
+        aliases: [donations.remove]
+        description: Remove applied package, benefit, or command
+        permission: donations.remove
+        usage: /<command> <Donation> <Package>[ <Benefit>[ <Command>]]
+    'donations:reload':
+        description: Reload Donations plugin
+        permission: donations.reload
+        usage: /<command>
+permissions:
+    donations.info:
+        description: Can use basic information commands
+        default: true
+        children:
+            donations.history: true
+            donations.benefits: true
+    donations.admin:
+        description: Can use all commands
+        default: op
+        children:
+            donations.info: true
+            donations.process: true
+            donations.remove: true
+            donations.reload: true
