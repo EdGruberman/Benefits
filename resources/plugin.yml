@@ -1,6 +1,5 @@
 name: @NAME@
 description: Manages donation benefits
-softdepend: [MessageManager]
 version: @VERSION@
 author: @AUTHOR@
 main: @MAIN@
