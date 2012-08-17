@@ -1,8 +1,7 @@
 package edgruberman.bukkit.donations.commands;
 
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +14,6 @@ import org.bukkit.entity.Player;
 import edgruberman.bukkit.donations.Coordinator;
 import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
-import edgruberman.bukkit.donations.messaging.messages.TimestampedMessage;
 
 public final class History implements CommandExecutor {
 
@@ -49,18 +47,14 @@ public final class History implements CommandExecutor {
         }
 
         final int total = (int) Math.ceil(history.size() / (double) this.pageSize);
-
-        final long now = System.currentTimeMillis();
-        final Calendar contributed = new GregorianCalendar();
-        contributed.setTimeZone(TimestampedMessage.getTimeZone(sender));
-
         final int first = Math.min((page - 1) * this.pageSize, history.size() - 1);
         final int last = Math.min(first + this.pageSize, history.size());
+        final long now = System.currentTimeMillis();
         for (final Donation donation : history.subList(first, last)) {
-            contributed.setTimeInMillis(donation.contributed);
             final String packages = History.join(donation.packages, "messages.history.packages");
             final long days = TimeUnit.MILLISECONDS.toDays(now - donation.contributed);
-            Main.courier.send(sender, "messages.history.donation", contributed, days, donation.amount, packages);
+            System.out.println(donation.amount);
+            Main.courier.send(sender, "messages.history.donation", new Date(donation.contributed), days, donation.amount, packages);
         }
 
         final long oldest = TimeUnit.MILLISECONDS.toDays(now - history.get(0).contributed);

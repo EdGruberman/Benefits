@@ -14,13 +14,13 @@ import org.bukkit.event.Listener;
 import edgruberman.bukkit.donations.Command;
 import edgruberman.bukkit.donations.Donation;
 
-public abstract class PlayerEventTrigger extends Trigger implements Listener {
+public abstract class PlayerEvent extends Trigger implements Listener {
 
     protected final Map<String, List<Donation>> donations = new HashMap<String, List<Donation>>();
 
     private boolean registered = false;
 
-    protected PlayerEventTrigger(final Command command, final ConfigurationSection definition) {
+    protected PlayerEvent(final Command command, final ConfigurationSection definition) {
         super(command, definition);
     }
 

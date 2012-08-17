@@ -1,9 +1,8 @@
 package edgruberman.bukkit.donations.commands;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -14,7 +13,6 @@ import edgruberman.bukkit.donations.Coordinator;
 import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
 import edgruberman.bukkit.donations.Package;
-import edgruberman.bukkit.donations.messaging.messages.TimestampedMessage;
 
 public final class Remove extends Executor {
 
@@ -67,32 +65,30 @@ public final class Remove extends Executor {
             }
         }
 
-        final Calendar contributed = new GregorianCalendar();
-        contributed.setTimeInMillis(donation.contributed);
-        contributed.setTimeZone(TimestampedMessage.getTimeZone(sender));
-
         final Collection<String> removed = new ArrayList<String>();
-
         if (cmd != null) {
-            cmd.remove(donation);
+            cmd.undo(donation);
             removed.add(cmd.getPath());
 
         } else if (benefit != null) {
             for (final Command c : benefit.commands.values()) {
-                c.remove(donation);
+                c.undo(donation);
                 removed.add(c.getPath());
             }
 
         } else {
             for (final Benefit b : pkg.benefits.values())
                 for (final Command c : b.commands.values()) {
-                    c.remove(donation);
+                    c.undo(donation);
                     removed.add(c.getPath());
                 }
         }
 
         this.coordinator.savePending();
-        Main.courier.send(sender, "messages.remove.success", donation.player, donation.amount, contributed, Remove.join(removed, "messages.remove.commands"));
+        Main.courier.send(sender, "messages.remove.success"
+                , donation.player, donation.amount, new Date(donation.contributed)
+                , Remove.join(removed, "messages.remove.commands"));
+
         return true;
 
     }
@@ -100,13 +96,10 @@ public final class Remove extends Executor {
     private static String join(final Collection<? extends String> col, final String path) {
         if (col == null || col.isEmpty()) return "";
 
-        final String format = Main.courier.format(path + ".+item");
-        final String delim = Main.courier.format(path + ".+delim");
-
         final StringBuilder sb = new StringBuilder();
         for (final String s : col) {
-            if (sb.length() > 0) sb.append(delim);
-            sb.append(String.format(format, s));
+            if (sb.length() > 0) sb.append(Main.courier.format(path + ".+delim"));
+            sb.append(Main.courier.format(path + ".+item", s));
         }
 
         return sb.toString();

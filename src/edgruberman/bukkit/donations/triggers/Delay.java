@@ -43,10 +43,10 @@ public class Delay extends Trigger implements Runnable {
         if (this.donations.size() == 0) return;
 
         final Donation donation = this.donations.first();
-        if (donation.contributed + this.delay > System.currentTimeMillis()) return;
-
-        this.command.dispatch(donation);
-        if (this.donations.size() == 0) return;
+        if (donation.contributed + this.delay <= System.currentTimeMillis()) {
+            this.command.dispatch(donation);
+            if (this.donations.size() == 0) return;
+        }
 
         this.taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(this.command.getCoordinator().plugin, this, this.tolerance);
     }

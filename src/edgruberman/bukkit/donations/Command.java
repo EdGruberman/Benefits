@@ -1,12 +1,13 @@
 package edgruberman.bukkit.donations;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 
 import edgruberman.bukkit.donations.triggers.Trigger;
 
@@ -17,13 +18,24 @@ public final class Command {
     public final Collection<String> dispatch = new ArrayList<String>();
     public final Collection<Trigger> triggers = new HashSet<Trigger>();
     public final Collection<Donation> pending = new HashSet<Donation>();
+    public final Collection<String> undo = new ArrayList<String>();
 
-    Command(final Benefit benefit, final String name, final List<String> dispatch) {
+    Command(final Benefit benefit, final ConfigurationSection definition) {
         this.benefit = benefit;
-        this.name = name;
-        if (dispatch != null)
-            for (final String d : dispatch)
-                this.dispatch.add(d);
+        this.name = definition.getName();
+        this.dispatch.addAll(Coordinator.getStringList(definition, "dispatch"));
+        this.undo.addAll(Coordinator.getStringList(definition, "undo"));
+
+        for (final String triggerClass : Coordinator.getStringList(definition, "triggers")) {
+            Trigger trigger;
+            try {
+                trigger = Trigger.create(triggerClass, this, definition);
+            } catch (final Exception e) {
+                this.benefit.pkg.coordinator.plugin.getLogger().warning("Failed to create Trigger: " + triggerClass + "; " + e.getClass().getName() + ": " + e.getMessage());
+                continue;
+            }
+            this.triggers.add(trigger);
+        }
     }
 
     void clear() {
@@ -42,51 +54,31 @@ public final class Command {
 
     public void dispatch(final Donation donation) {
         this.remove(donation);
-        for (final String d : this.dispatch) {
-            final String command = String.format(d, donation.player, donation.amount, new Date(donation.contributed), donation.getKey());
-            this.getCoordinator().plugin.getLogger().finest("Dispatching command: " + command);
-            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
-        }
+        this.execute(donation, this.dispatch);
         this.getCoordinator().savePending();
     }
 
-    public void remove(final Donation donation) {
+    public void undo(final Donation donation) {
+        this.remove(donation);
+        this.execute(donation, this.undo);
+        this.getCoordinator().savePending();
+    }
+
+    private void execute(final Donation donation, final Collection<String> commands) {
+        for (final String d : commands) {
+            final String command = MessageFormat.format(d, donation.player, donation.amount, new Date(donation.contributed), donation.getKey());
+            this.getCoordinator().plugin.getLogger().finest("Executing command: " + command);
+            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+        }
+    }
+
+    private void remove(final Donation donation) {
         this.pending.remove(donation);
         for (final Trigger trigger : this.triggers) trigger.remove(donation);
     }
 
     public Coordinator getCoordinator() {
         return this.benefit.pkg.coordinator;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        final Command other = (Command) obj;
-        if (this.name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!this.name.equals(other.name)) {
-            return false;
-        }
-        return true;
     }
 
     public String getPath() {

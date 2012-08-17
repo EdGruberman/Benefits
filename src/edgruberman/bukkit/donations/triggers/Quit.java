@@ -6,7 +6,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import edgruberman.bukkit.donations.Command;
 
-public class Quit extends PlayerEventTrigger {
+public class Quit extends PlayerEvent {
 
     public Quit(final Command command, final ConfigurationSection definition) {
         super(command, definition);

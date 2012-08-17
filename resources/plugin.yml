@@ -19,10 +19,20 @@ commands:
         description: Process a donation
         permission: donations.process
         usage: /<command> <Donator> <Amount>[ <When>]
-    'donations:remove':
-        aliases: [donations.remove]
-        description: Remove applied package, benefit, or command
+    'donations:apply':
+        aliases: [donations.apply]
+        description: Dispatch commands for package, benefit, or command
+        permission: donations.apply
+        usage: /<command> <Player> <Package>[ <Benefit>[ <Command>]]
+    'donations:undo':
+        aliases: [donations.undo]
+        description: Revert applied package, benefit, or command for donation
         permission: donations.remove
+        usage: /<command> <Donation> <Package>[ <Benefit>[ <Command>]]
+    'donations:reset':
+        aliases: [donations.reset]
+        description: Remove any package, benefit, or command that is not for donation
+        permission: donations.reset
         usage: /<command> <Donation> <Package>[ <Benefit>[ <Command>]]
     'donations:reload':
         description: Reload Donations plugin

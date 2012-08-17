@@ -6,7 +6,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import edgruberman.bukkit.donations.Command;
 
-public final class Death extends PlayerEventTrigger {
+public final class Death extends PlayerEvent {
 
     public Death(final Command command, final ConfigurationSection definition) {
         super(command, definition);

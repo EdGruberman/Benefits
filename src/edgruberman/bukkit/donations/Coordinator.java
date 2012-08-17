@@ -16,8 +16,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import edgruberman.bukkit.donations.triggers.Trigger;
-
 public final class Coordinator implements Runnable {
 
     private static final long LIMIT_TOLERANCE = 1000 * 60 * 60 * 12; // 12 hours
@@ -116,7 +114,7 @@ public final class Coordinator implements Runnable {
         }
     }
 
-    /** Processed donations for a given player ordered by newest contribution first */
+    /** processed donations for a given player ordered by newest contribution first */
     public List<Donation> history(final String player) {
         final List<Donation> history = new ArrayList<Donation>();
         for (final Donation donation : this.processed.values())
@@ -127,7 +125,7 @@ public final class Coordinator implements Runnable {
         return history;
     }
 
-    /** Packages to be applied for a given donation amount ordered by lowest minimum first */
+    /** packages to be applied for a given donation amount ordered by lowest minimum first */
     public List<Package> applicable(final double amount) {
         final List<Package> applicable = new ArrayList<Package>();
         for (final Package pkg : this.packages.values())
@@ -140,40 +138,8 @@ public final class Coordinator implements Runnable {
 
     // TODO check for duplicates while loading and send warning to log
     private void loadPackages(final ConfigurationSection packages) {
-        // Load packages
         for (final String packageName : packages.getKeys(false)) {
-            final ConfigurationSection pkgConfig = packages.getConfigurationSection(packageName);
-            final Package pkg = new Package(this, packageName, pkgConfig.getString("description"), pkgConfig.getDouble("minimum"), pkgConfig.getInt("limit"));
-
-            // Load benefits for each package
-            final ConfigurationSection benefits = pkgConfig.getConfigurationSection("benefits");
-            for (final String benefitName : benefits.getKeys(false)) {
-                final ConfigurationSection benefitConfig = benefits.getConfigurationSection(benefitName);
-                final Benefit benefit = new Benefit(pkg, benefitName, benefitConfig.getString("description"), benefitConfig.getInt("limit"));
-
-                // Load commands for each benefit
-                final ConfigurationSection commands = benefitConfig.getConfigurationSection("commands");
-                for (final String commandName : commands.getKeys(false)) {
-                    final ConfigurationSection commandConfig = commands.getConfigurationSection(commandName);
-                    final Command command = new Command(benefit, commandName, Coordinator.getStringList(commandConfig, "dispatch"));
-
-                    // Load triggers for each command
-                    for (final String triggerClass : commandConfig.getStringList("triggers")) {
-                        Trigger trigger;
-                        try {
-                            trigger = Trigger.create(triggerClass, command, commandConfig);
-                        } catch (final Exception e) {
-                            this.plugin.getLogger().warning("Failed to create Trigger: " + triggerClass + "; " + e.getClass().getName() + ": " + e.getMessage());
-                            continue;
-                        }
-                        command.triggers.add(trigger);
-                    }
-                    benefit.commands.put(command.name.toLowerCase(), command);
-
-                }
-                pkg.benefits.put(benefit.name.toLowerCase(), benefit);
-
-            }
+            final Package pkg = new Package(this, packages.getConfigurationSection(packageName));
             this.packages.put(pkg.name.toLowerCase(), pkg);
         }
     }
@@ -252,11 +218,14 @@ public final class Coordinator implements Runnable {
         }
     }
 
-    private static List<String> getStringList(final ConfigurationSection config, final String path) {
+    static List<String> getStringList(final ConfigurationSection config, final String path) {
         if (config.isList(path))
             return config.getStringList(path);
 
-        return Arrays.asList(config.getString(path));
+        if (config.isString(path))
+            return Arrays.asList(config.getString(path));
+
+        return Collections.emptyList();
     }
 
 }

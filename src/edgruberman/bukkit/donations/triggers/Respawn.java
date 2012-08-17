@@ -6,7 +6,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 import edgruberman.bukkit.donations.Command;
 
-public class Respawn extends PlayerEventTrigger {
+public class Respawn extends PlayerEvent {
 
     public Respawn(final Command command, final ConfigurationSection definition) {
         super(command, definition);

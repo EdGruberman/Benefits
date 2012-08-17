@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import edgruberman.bukkit.donations.Command;
 
 /** Player's next join */
-public class Join extends PlayerEventTrigger {
+public class Join extends PlayerEvent {
 
     public Join(final Command command, final ConfigurationSection definition) {
         super(command, definition);
