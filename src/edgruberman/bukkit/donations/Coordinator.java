@@ -139,6 +139,7 @@ public final class Coordinator implements Runnable {
     // TODO check for duplicates while loading and send warning to log
     private void loadPackages(final ConfigurationSection packages) {
         for (final String packageName : packages.getKeys(false)) {
+            if (packageName.equals("version")) continue;
             final Package pkg = new Package(this, packages.getConfigurationSection(packageName));
             this.packages.put(pkg.name.toLowerCase(), pkg);
         }

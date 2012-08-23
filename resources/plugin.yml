@@ -27,7 +27,7 @@ commands:
     'donations:undo':
         aliases: [donations.undo]
         description: Revert applied package, benefit, or command for donation
-        permission: donations.remove
+        permission: donations.undo
         usage: /<command> <Donation> <Package>[ <Benefit>[ <Command>]]
     'donations:reset':
         aliases: [donations.reset]
@@ -51,5 +51,5 @@ permissions:
         children:
             donations.info: true
             donations.process: true
-            donations.remove: true
+            donations.undo: true
             donations.reload: true

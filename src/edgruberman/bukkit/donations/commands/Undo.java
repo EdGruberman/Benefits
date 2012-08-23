@@ -14,11 +14,11 @@ import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
 import edgruberman.bukkit.donations.Package;
 
-public final class Remove extends Executor {
+public final class Undo extends Executor {
 
     private final Coordinator coordinator;
 
-    public Remove(final Coordinator coordinator) {
+    public Undo(final Coordinator coordinator) {
         this.coordinator = coordinator;
     }
 
@@ -87,7 +87,7 @@ public final class Remove extends Executor {
         this.coordinator.savePending();
         Main.courier.send(sender, "messages.remove.success"
                 , donation.player, donation.amount, new Date(donation.contributed)
-                , Remove.join(removed, "messages.remove.commands"));
+                , Undo.join(removed, "messages.remove.commands"));
 
         return true;
 

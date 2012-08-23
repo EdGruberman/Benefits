@@ -1,5 +1,4 @@
-package edgruberman.bukkit.donations;
-
+package edgruberman.bukkit.donations.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
