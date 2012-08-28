@@ -1,8 +1,8 @@
 name: @NAME@
-description: Manages donation benefits
 version: @VERSION@
-author: @AUTHOR@
-main: @MAIN@
+description: Manages donation benefits
+author: EdGruberman (ed@rjump.com)
+main: edgruberman.bukkit.donations.Main
 commands:
     'donations:history':
         aliases: [donations, history, donations.history]
