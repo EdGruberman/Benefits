@@ -22,7 +22,7 @@ public final class Main extends CustomPlugin {
 
     @Override
     public void onLoad() {
-        this.putConfigMinimum("config.yml", "0.0.0a72");
+        this.putConfigMinimum(CustomPlugin.CONFIGURATION_FILE, "0.0.0a72");
         this.putConfigMinimum("packages.yml", "0.0.0a72");
     }
 
