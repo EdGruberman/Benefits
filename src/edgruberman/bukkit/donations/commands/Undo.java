@@ -26,24 +26,24 @@ public final class Undo extends Executor {
     @Override
     protected boolean execute(final CommandSender sender, final org.bukkit.command.Command command, final String label, final List<String> args) {
         if (args.size() < 1) {
-            Main.courier.send(sender, "messages.requiresArgument", "<Donation>");
+            Main.courier.send(sender, "requires-argument", "<Donation>");
             return false;
         }
 
         final Donation donation = this.coordinator.processed.get(args.get(0).toLowerCase());
         if (donation == null) {
-            Main.courier.send(sender, "messages.unknownArgument", "<Donation>", args.get(0));
+            Main.courier.send(sender, "unknown-argument", "<Donation>", args.get(0));
             return false;
         }
 
         if (args.size() < 2) {
-            Main.courier.send(sender, "messages.requiresArgument", "<Package>");
+            Main.courier.send(sender, "requires-argument", "<Package>");
             return false;
         }
 
         final Package pkg = this.coordinator.packages.get(args.get(1).toLowerCase());
         if (pkg == null) {
-            Main.courier.send(sender, "messages.unknownArgument", "<Package>", args.get(1));
+            Main.courier.send(sender, "unknown-argument", "<Package>", args.get(1));
             return false;
         }
 
@@ -51,7 +51,7 @@ public final class Undo extends Executor {
         if (args.size() >= 3) {
             benefit = pkg.benefits.get(args.get(2).toLowerCase());
             if (benefit == null) {
-                Main.courier.send(sender, "messages.unknownArgument", "<Benefit>", args.get(2));
+                Main.courier.send(sender, "unknown-argument", "<Benefit>", args.get(2));
                 return false;
             }
         }
@@ -60,7 +60,7 @@ public final class Undo extends Executor {
         if (args.size() >= 4) {
             cmd = benefit.commands.get(args.get(3).toLowerCase());
             if (cmd == null) {
-                Main.courier.send(sender, "messages.unknownArgument", "<Command>", args.get(3));
+                Main.courier.send(sender, "unknown-argument", "<Command>", args.get(3));
                 return false;
             }
         }
@@ -85,9 +85,9 @@ public final class Undo extends Executor {
         }
 
         this.coordinator.savePending();
-        Main.courier.send(sender, "messages.remove.success"
+        Main.courier.send(sender, "remove.success"
                 , donation.player, donation.amount, new Date(donation.contributed)
-                , Undo.join(removed, "messages.remove.commands"));
+                , Undo.join(removed, "remove.commands"));
 
         return true;
 

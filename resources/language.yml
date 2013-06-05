@@ -1,0 +1,34 @@
+format-code: '§'
+history:
+  none: '-> No donation history found for {1}' # 1 = <Player>
+  donation: '-> {1,date,yyyy MMM dd hh:mm aa} ({2,choice,0#<1|1#{2}}d) = §a${3,number,#.##}§r [{4}]' # 1 = Contributed, 2 = Days Since Contributed, 3 = Amount (USD), 4 = Packages
+  packages:
+    +item: '{0}' # 0 = Package
+    +delim: ', '
+  summary: # 1 = Donator, 2 = Oldest (Days), 3 = Newest (Days), 4 = Current Page, 5 = Page Count, 6 = Donation Count, 7 = Donation Sum
+    - '-> {1} donated §a${7,number,#.##}§r over {6} donations'
+    - '-> §7(Last: {3,choice,0#<1|1#{3}}d, First: {2,choice,0#<1|1#{2}}d)  Page §f{4}§7 of §f{5}'
+benefits:
+  none: '-> No benefits found'
+  package: '-> {1}: §a${3,number,#.##}+§r = {2}{4}' # 1 = Package, 2 = Description, 3 = Minimum, 4 = Limit
+  +limit: ' (§e{0}d limit§r)' # 1 = Limit (Days)
+  instruction: '§7To list specifics: /benefits "<Package>" §8(e.g. §5/benefits Donor§8)'
+  benefit: '-> {1}: {2} = {3}' # 1 = Package, 2 = Benefit, 3 = Description
+process:
+  success: # 1 = Donator, 2 = Amount, 3 = Packages
+    - '-> Donation of §a${2,number,#.##} §2processed§r for {1}'
+    - '-> Packages applied: {3}'
+  packages:
+    +item: '{0}' # 0 = Package
+    +delim: ', '
+remove:
+  success: # 1 = Donator, 2 = Amount, 3 = Contributed, 4 = Commands
+    - '-> Removed donation of §a${2,number,#.##}§r from {1} on {3,date,yyyy MMM dd hh:mm aa}'
+    - '-> Commands removed: {4}'
+  commands:
+    +item: '{0}' # 0 = Command
+    +delim: ', '
+requires-argument: '§f-> §cMissing §7required argument: §b§o{1}' # 0 = Generated, 1 = Argument Name
+unknown-argument: '§f-> §eUnknown§f value for §b§o{1}§7: §f{2}' # 0 = Generated, 1 = Argument Name, 2 = Argument Value
+reload: '§f-> §2Reloaded §7{1} plugin' # 0 = Generated, 1 = Plugin Name
+version: @VERSION@

@@ -35,14 +35,14 @@ public final class History implements CommandExecutor {
         final Integer page =  History.parsePage(args);
 
         if (args.length < 2 && !(sender instanceof Player)) {
-            Main.courier.send(sender, "messages.requiresArgument", "<Page> <Player>");
+            Main.courier.send(sender, "requires-argument", "<Page> <Player>");
             return false;
         }
 
         final String target = (args.length >= 2 ? Bukkit.getOfflinePlayer(args[1]).getName() : sender.getName());
         final List<Donation> history = this.coordinator.history(target);
         if (history.size() == 0) {
-            Main.courier.send(sender, "messages.history.none", target);
+            Main.courier.send(sender, "history.none", target);
             return true;
         }
 
@@ -51,16 +51,16 @@ public final class History implements CommandExecutor {
         final int last = Math.min(first + this.pageSize, history.size());
         final long now = System.currentTimeMillis();
         for (final Donation donation : history.subList(first, last)) {
-            final String packages = History.join(donation.packages, "messages.history.packages");
+            final String packages = History.join(donation.packages, "history.packages");
             final long days = TimeUnit.MILLISECONDS.toDays(now - donation.contributed);
             System.out.println(donation.amount);
-            Main.courier.send(sender, "messages.history.donation", new Date(donation.contributed), days, donation.amount, packages);
+            Main.courier.send(sender, "history.donation", new Date(donation.contributed), days, donation.amount, packages);
         }
 
         final long oldest = TimeUnit.MILLISECONDS.toDays(now - history.get(0).contributed);
         final long newest = TimeUnit.MILLISECONDS.toDays(now - history.get(history.size() - 1).contributed);
         double sum = 0; for (final Donation donation : history) sum += donation.amount;
-        Main.courier.send(sender, "messages.history.summary", target, oldest, newest, page, total, history.size(), sum);
+        Main.courier.send(sender, "history.summary", target, oldest, newest, page, total, history.size(), sum);
         return true;
     }
 

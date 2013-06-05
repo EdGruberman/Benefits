@@ -23,7 +23,7 @@ public final class Benefits extends Executor {
     protected boolean execute(final CommandSender sender, final Command command, final String label, final List<String> args) {
         if (args.size() == 0) {
             if (this.coordinator.packages.size() == 0) {
-                Main.courier.send(sender, "messages.benefits.none");
+                Main.courier.send(sender, "benefits.none");
                 return true;
             }
 
@@ -31,24 +31,24 @@ public final class Benefits extends Executor {
             // Spawn City: $10.00+ USD - Spawn anything, any time
             // To list benefits: /benefits "<Package>" (Example: /benefits Donor)
             for (final Package pkg : this.coordinator.packages.values()) {
-                final String limit = (pkg.limit != null ? Main.courier.format("messages.benefits.+limit", pkg.limit): "");
-                Main.courier.send(sender, "messages.benefits.package", pkg.name, pkg.description, pkg.minimum, limit);
+                final String limit = (pkg.limit != null ? Main.courier.format("benefits.+limit", pkg.limit): "");
+                Main.courier.send(sender, "benefits.package", pkg.name, pkg.description, pkg.minimum, limit);
             }
-            Main.courier.send(sender, "messages.benefits.instruction");
+            Main.courier.send(sender, "benefits.instruction");
 
             return true;
         }
 
         final Package pkg = this.coordinator.packages.get(args.get(0).toLowerCase());
         if (pkg == null || pkg.benefits.size() == 0) {
-            Main.courier.send(sender, "messages.benefits.none");
+            Main.courier.send(sender, "benefits.none");
             return true;
         }
 
         // Donor: Confirmation = Notification regarding a received donation
         // Donor: Resurrection = Extra life after death
         for (final Benefit benefit : pkg.benefits.values())
-            Main.courier.send(sender, "messages.benefits.benefit", pkg.name, benefit.name, benefit.description);
+            Main.courier.send(sender, "benefits.benefit", pkg.name, benefit.name, benefit.description);
 
         return true;
     }

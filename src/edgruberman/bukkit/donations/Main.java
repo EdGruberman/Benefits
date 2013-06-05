@@ -11,12 +11,11 @@ import edgruberman.bukkit.donations.commands.Process;
 import edgruberman.bukkit.donations.commands.Reload;
 import edgruberman.bukkit.donations.commands.Undo;
 import edgruberman.bukkit.donations.messaging.ConfigurationCourier;
-import edgruberman.bukkit.donations.messaging.Courier;
 import edgruberman.bukkit.donations.util.CustomPlugin;
 
 public final class Main extends CustomPlugin {
 
-    public static Courier courier;
+    public static ConfigurationCourier courier;
 
     private Coordinator coordinator;
 
@@ -29,7 +28,7 @@ public final class Main extends CustomPlugin {
     @Override
     public void onEnable() {
         this.reloadConfig();
-        Main.courier = new ConfigurationCourier(this);
+        Main.courier = ConfigurationCourier.Factory.create(this).setBase(this.loadConfig("language.yml")).setFormatCode("format-code").build();
 
         // initialize offline player names with proper casing in cache
         Bukkit.getServer().getOfflinePlayers();

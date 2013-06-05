@@ -25,31 +25,31 @@ public final class Process implements CommandExecutor {
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
         if (args.length < 1) {
-            Main.courier.send(sender, "messages.requiresArgument", "<Donator>");
+            Main.courier.send(sender, "requires-argument", "<Donator>");
             return false;
         }
 
         if (args.length < 2) {
-            Main.courier.send(sender, "messages.requiresArgument", "<Amount>");
+            Main.courier.send(sender, "requires-argument", "<Amount>");
             return false;
         }
 
         final String donator = args[0];
         final Double amount = Process.parseDouble(args[1]);
         if (amount == null) {
-            Main.courier.send(sender, "messages.unknownArgument", "<Amount>", args[1]);
+            Main.courier.send(sender, "unknown-argument", "<Amount>", args[1]);
             return false;
         }
 
         final Date when = (args.length >= 3 ? Process.parseDate(args[2]) : new Date());
         if (when == null) {
-            Main.courier.send(sender, "messages.unknownArgument", "<Amount>", args[2]);
+            Main.courier.send(sender, "unknown-argument", "<Amount>", args[2]);
             return false;
         }
 
         final Donation donation = new Donation(sender.getName(), donator, amount, when.getTime(), null);
         this.coordinator.process(donation);
-        Main.courier.send(sender, "messages.process.success", donator, amount, Process.join(donation.packages, "messages.process.packages"));
+        Main.courier.send(sender, "process.success", donator, amount, Process.join(donation.packages, "process.packages"));
         return true;
     }
 
