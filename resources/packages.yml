@@ -1,5 +1,5 @@
 # commands: 0 = Player, 1 = Amount, 2 = Contributed, 3 = Donation Key
-Donor:
+Donator:
     description: Recognition for server support
     minimum: 5.00
     limit: 0
@@ -11,7 +11,7 @@ Donor:
                     triggers: [Online]
                     dispatch:
                         - 'messageformatter:send {0} §2§k####§r Thank you for your §a${1,number,#.##}§r donation!'
-                        - 'messageformatter:send {0} §2§k####§r Donors such as yourself keep this server running!'
+                        - 'messageformatter:send {0} §2§k####§r Donators such as yourself keep this server running!'
                         - 'donations:undo {3} Donor Confirmation'
                 Expire:
                     triggers: [Delay]
@@ -31,14 +31,14 @@ Donor:
                     tolerance: 30
                     dispatch: 'donations:undo {3} Donor "Chat Name Color"'
         Sponges:
-            description: One sponge block per dollar
+            description: Sponges do nothing, but they sure do look odd!
             commands:
                 Grant:
                     triggers: [Instant]
                     dispatch: 'kitteh:kit.grant Sponges {0} {1,number,#} "Thank you for your ${1,number,#.##} donation on {2,date,yyyy MMM dd hh:mm aa}!"'
                     undo: 'kitteh:kit.revoke Sponges {0} {1,number,#}'
 Supporter:
-    description: Chat color codes
+    description: Additional benefits
     minimum: 10.00
     limit: 30 # days
     benefits:

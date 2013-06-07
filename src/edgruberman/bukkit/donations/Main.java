@@ -1,8 +1,14 @@
 package edgruberman.bukkit.donations;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.HandlerList;
 
 import edgruberman.bukkit.donations.commands.Benefits;
@@ -11,32 +17,42 @@ import edgruberman.bukkit.donations.commands.Process;
 import edgruberman.bukkit.donations.commands.Reload;
 import edgruberman.bukkit.donations.commands.Undo;
 import edgruberman.bukkit.donations.messaging.ConfigurationCourier;
+import edgruberman.bukkit.donations.util.BufferedYamlConfiguration;
 import edgruberman.bukkit.donations.util.CustomPlugin;
 
 public final class Main extends CustomPlugin {
 
+    private static final String PACKAGES_FILE = "packages.yml";
+
     public static ConfigurationCourier courier;
 
     private Coordinator coordinator;
+    private BufferedYamlConfiguration assigned;
+    private BufferedYamlConfiguration pending;
 
     @Override
     public void onLoad() {
-        this.putConfigMinimum(CustomPlugin.CONFIGURATION_FILE, "0.0.0a72");
-        this.putConfigMinimum("packages.yml", "0.0.0a72");
+        this.putConfigMinimum("0.0.0a78");
+        this.putConfigMinimum(Main.PACKAGES_FILE, "0.0.0a78");
     }
 
     @Override
     public void onEnable() {
         this.reloadConfig();
-        Main.courier = ConfigurationCourier.Factory.create(this).setBase(this.loadConfig("language.yml")).setFormatCode("format-code").build();
+        Main.courier = ConfigurationCourier.create(this).setBase(this.loadConfig("language.yml")).setFormatCode("format-code").build();
 
         // initialize offline player names with proper casing in cache
         Bukkit.getServer().getOfflinePlayers();
 
-        final File pending = new File(this.getDataFolder(), this.getConfig().getString("pending"));
-        final File incoming = new File(this.getDataFolder(), this.getConfig().getString("incoming"));
-        final File processed = new File(this.getDataFolder(), this.getConfig().getString("processed"));
-        this.coordinator = new Coordinator(this, this.loadConfig("packages.yml"), this.getConfig().getInt("period"), pending, incoming, processed);
+        this.coordinator = new Coordinator(this);
+
+        this.loadPackages(this.loadConfig(Main.PACKAGES_FILE));
+
+        this.assigned = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "assigned.yml"), 5000);
+        this.loadAssigned(this.assigned);
+
+        this.pending = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "pending.yml"), 5000);
+        this.loadPending(this.pending);
 
         this.getCommand("donations:history").setExecutor(new History(this.coordinator));
         this.getCommand("donations:benefits").setExecutor(new Benefits(this.coordinator));
@@ -54,6 +70,100 @@ public final class Main extends CustomPlugin {
         this.coordinator = null;
 
         Main.courier = null;
+    }
+
+    // TODO check for duplicates while loading and send warning to log
+    private void loadPackages(final Configuration packages) {
+        for (final String name : packages.getKeys(false)) {
+            if (name.equals("version")) continue;
+            final Package pkg = new Package(this.coordinator, packages.getConfigurationSection(name));
+            this.coordinator.addPackage(pkg);
+        }
+    }
+
+    // TODO check for duplicates while loading and send warning to log
+    private void loadAssigned(final Configuration assigned) {
+        for (final String key : assigned.getKeys(false)) {
+            final ConfigurationSection entry = assigned.getConfigurationSection(key);
+
+            final Donation donation = new Donation(entry.getString("processor"), entry.getString("id"), entry.getString("origin")
+                    , entry.getString("player") , entry.getDouble("amount"), entry.getLong("contributed"), entry.getStringList("packages"));
+
+            this.coordinator.addAssigned(donation);
+            this.getLogger().log(Level.FINEST, "Loaded assigned donation: " + donation.getKey() + " = " + donation.toString());
+        }
+    }
+
+    void saveAssigned(final Donation donation) {
+        final ConfigurationSection entry = this.assigned.createSection(donation.getKey());
+        entry.set("processor", donation.processor);
+        entry.set("id", donation.id);
+        entry.set("origin", donation.origin);
+        entry.set("player", donation.player);
+        entry.set("amount", donation.amount);
+        entry.set("contributed", donation.contributed);
+        entry.set("packages", donation.packages);
+        this.assigned.save();
+    }
+
+    private void loadPending(final Configuration pending) {
+        for (final String packageName : pending.getKeys(false)) {
+            final ConfigurationSection benefits = pending.getConfigurationSection(packageName);
+
+            for (final String benefitName : benefits.getKeys(false)) {
+                final ConfigurationSection commands = benefits.getConfigurationSection(benefitName);
+
+                for (final String commandName : commands.getKeys(false)) {
+
+                    for (final String donationKey : commands.getStringList(commandName)) {
+                        final Donation donation = this.coordinator.getAssigned(donationKey);
+                        if (donation == null) {
+                            this.getLogger().warning("Unable to find donation " + donationKey + " to add to " + packageName + "." + benefitName + "." + commandName);
+                            continue;
+                        }
+
+                        final Package pkg = this.coordinator.getPackage(packageName.toLowerCase());
+                        if (pkg == null) {
+                            this.getLogger().warning("Unable to find package " + packageName + " to add " + donationKey + " to " + packageName + "." + benefitName + "." + commandName);
+                            continue;
+                        }
+
+                        final Benefit benefit = pkg.benefits.get(benefitName.toLowerCase());
+                        if (benefit == null) {
+                            this.getLogger().warning("Unable to find benefit " + benefitName + " to add " + donationKey + " to " + packageName + "." + benefitName + "." + commandName);
+                            continue;
+                        }
+
+                        final Command command = benefit.commands.get(commandName.toLowerCase());
+                        if (command == null) {
+                            this.getLogger().warning("Unable to find command " + commandName + " to add " + donationKey + " to " + packageName + "." + benefitName + "." + commandName);
+                            continue;
+                        }
+
+                        command.add(donation);
+                    }
+                }
+            }
+        }
+    }
+
+    void savePending() {
+        try {
+            this.pending.loadFromString("");
+        } catch (final InvalidConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (final Package pkg : this.coordinator.packages.values())
+            for (final Benefit benefit : pkg.benefits.values())
+                for (final Command command : benefit.commands.values())
+                    for (final Trigger trigger : command.triggers) {
+                        final List<String> donations = new ArrayList<String>();
+                        for (final Donation donation : trigger.getPending()) donations.add(donation.getKey());
+                        if (donations.size() > 0) this.pending.set(pkg.name + "." + benefit.name + "." + command.name, donations);
+                    }
+
+        this.pending.save();
     }
 
 }

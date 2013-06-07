@@ -1,6 +1,2 @@
-logLevel: ALL
-period: 60 # seconds
-pending: pending.yml
-incoming: incoming/
-processed: processed/
+log-level: ALL
 version: @VERSION@
