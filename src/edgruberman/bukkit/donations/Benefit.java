@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-/** Collection of commands */
+/** collection of commands */
 public final class Benefit {
 
     public final Package pkg;

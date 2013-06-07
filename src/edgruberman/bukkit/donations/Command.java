@@ -2,9 +2,12 @@ package edgruberman.bukkit.donations;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,10 +23,10 @@ public final class Command {
     Command(final Benefit benefit, final ConfigurationSection definition) {
         this.benefit = benefit;
         this.name = definition.getName();
-        this.dispatch.addAll(Coordinator.getStringList(definition, "dispatch"));
-        this.undo.addAll(Coordinator.getStringList(definition, "undo"));
+        this.dispatch.addAll(Command.getStringList(definition, "dispatch"));
+        this.undo.addAll(Command.getStringList(definition, "undo"));
 
-        for (final String triggerClass : Coordinator.getStringList(definition, "triggers")) {
+        for (final String triggerClass : Command.getStringList(definition, "triggers")) {
             Trigger trigger;
             try {
                 trigger = Trigger.create(triggerClass, this, definition);
@@ -83,6 +86,18 @@ public final class Command {
     @Override
     public String toString() {
         return "Command: [getPath(): " + this.getPath() + "; dispatch:" + this.dispatch + "; triggers: " + this.triggers + "]";
+    }
+
+
+
+    private static List<String> getStringList(final ConfigurationSection config, final String path) {
+        if (config.isList(path))
+            return config.getStringList(path);
+
+        if (config.isString(path))
+            return Arrays.asList(config.getString(path));
+
+        return Collections.emptyList();
     }
 
 }

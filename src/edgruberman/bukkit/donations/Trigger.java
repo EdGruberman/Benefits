@@ -51,7 +51,7 @@ public abstract class Trigger {
         return Collections.emptyList();
     }
 
-    /** prepare a trigger to be fired for a processed donation */
+    /** prepare a trigger to be fired for a donation */
     public abstract void add(final Donation donation);
 
     /** prevent a trigger from firing in the future for a donation */

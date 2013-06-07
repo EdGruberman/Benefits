@@ -11,7 +11,7 @@ public abstract class Processor {
 
     protected Donation process(final String id, final String origin, final String player, final double amount, final long contributed) {
         final Donation donation = new Donation(this.getClass().getName(), id, origin, player, amount, contributed, null);
-        this.coordinator.distribute(donation);
+        this.coordinator.assign(donation);
         return donation;
     }
 
