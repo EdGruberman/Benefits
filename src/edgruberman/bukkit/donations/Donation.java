@@ -4,78 +4,70 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
-/** Record of money being granted */
+/** record of money being granted */
 public final class Donation {
 
-    /** Source of donation, usually an e-mail address */
+    /** fully qualified class name of payment processor */
+    public final String processor;
+
+    /** payment processor specific unique identifier */
+    public final String id;
+
+    /** source of donation, usually an e-mail address */
     public final String origin;
 
-    /** In-game name of player to apply donation benefits to */
+    /** in-game name of player to apply donation benefits to */
     public final String player;
 
-    /** Financial total donated (USD) */
+    /** financial total donated (USD) */
     public final double amount;
 
-    /** When donation was made in milliSeconds from midnight, January 1, 1970 UTC */
+    /** when donation was made in milliSeconds from midnight, January 1, 1970 UTC */
     public final Long contributed;
 
-    /** Package names applied to donation */
+    /** package names applied to donation */
     public Collection<String> packages = new ArrayList<String>();
 
-    public Donation(final String origin, final String player, final double amount, final long contributed, final Collection<String> packages) {
+    private final String key;
+
+    /** new, unassigned, incoming donation */
+    public Donation(final String processor, final String id, final String origin, final String player, final double amount, final long contributed) {
+        this(processor, id, origin, player, amount, contributed, null);
+    }
+
+    /** existing donation with packages already applied */
+    public Donation(final String processor, final String id, final String origin, final String player, final double amount, final long contributed, final Collection<String> packages) {
+        this.processor = processor;
+        this.id = id;
         this.origin = origin;
         this.player = player;
         this.amount = amount;
         this.contributed = contributed;
         if (packages != null) this.packages.addAll(packages);
+
+        this.key = this.processor.toLowerCase() + "-" + this.id;
     }
 
-    /** <Player>-<Origin>-<Contributed> */
+    /** (Processor)-(ID) */
     public String getKey() {
-        return this.player.toLowerCase() + "-" + this.origin.replaceAll("\\.", "_").toLowerCase() + "-" + this.contributed;
+        return this.key;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (this.contributed ^ (this.contributed >>> 32));
-        result = prime * result + ((this.origin == null) ? 0 : this.origin.hashCode());
-        result = prime * result
-                + ((this.player == null) ? 0 : this.player.hashCode());
+        result = prime * result + ((this.key == null) ? 0 : this.key.hashCode());
         return result;
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (!(obj instanceof Donation)) return false;
         final Donation other = (Donation) obj;
-        if (this.contributed != other.contributed) {
-            return false;
-        }
-        if (this.origin == null) {
-            if (other.origin != null) {
-                return false;
-            }
-        } else if (!this.origin.equals(other.origin)) {
-            return false;
-        }
-        if (this.player == null) {
-            if (other.player != null) {
-                return false;
-            }
-        } else if (!this.player.equals(other.player)) {
-            return false;
-        }
-        return true;
+        return this.key.equals(other.key);
     }
 
     @Override

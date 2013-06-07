@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,13 +13,12 @@ import org.bukkit.command.CommandSender;
 import edgruberman.bukkit.donations.Coordinator;
 import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
+import edgruberman.bukkit.donations.Processor;
 
-public final class Process implements CommandExecutor {
-
-    private final Coordinator coordinator;
+public final class Process extends Processor implements CommandExecutor {
 
     public Process(final Coordinator coordinator) {
-        this.coordinator = coordinator;
+        super(coordinator);
     }
 
     // usage: /<command> <Donator> <Amount>[ <When>]
@@ -47,8 +47,7 @@ public final class Process implements CommandExecutor {
             return false;
         }
 
-        final Donation donation = new Donation(sender.getName(), donator, amount, when.getTime(), null);
-        this.coordinator.process(donation);
+        final Donation donation = this.process(UUID.randomUUID().toString(), sender.getName(), donator, amount, when.getTime());
         Main.courier.send(sender, "process.success", donator, amount, Process.join(donation.packages, "process.packages"));
         return true;
     }
