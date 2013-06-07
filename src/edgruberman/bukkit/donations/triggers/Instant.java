@@ -4,6 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import edgruberman.bukkit.donations.Command;
 import edgruberman.bukkit.donations.Donation;
+import edgruberman.bukkit.donations.Trigger;
 
 public class Instant extends Trigger {
 

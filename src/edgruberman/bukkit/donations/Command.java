@@ -9,16 +9,13 @@ import java.util.HashSet;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import edgruberman.bukkit.donations.triggers.Trigger;
-
 public final class Command {
 
     public final Benefit benefit;
     public final String name;
     public final Collection<String> dispatch = new ArrayList<String>();
-    public final Collection<Trigger> triggers = new HashSet<Trigger>();
-    public final Collection<Donation> pending = new HashSet<Donation>();
     public final Collection<String> undo = new ArrayList<String>();
+    public final Collection<Trigger> triggers = new HashSet<Trigger>();
 
     Command(final Benefit benefit, final ConfigurationSection definition) {
         this.benefit = benefit;
@@ -41,11 +38,9 @@ public final class Command {
     void clear() {
         for (final Trigger trigger : this.triggers) trigger.clear();
         this.triggers.clear();
-        this.pending.clear();
     }
 
     public void add(final Donation donation) {
-        this.pending.add(donation);
         for (final Trigger trigger : this.triggers) {
             this.getCoordinator().plugin.getLogger().finest("Adding " + donation.toString() + " to " + trigger.getPath());
             trigger.add(donation);
@@ -73,8 +68,8 @@ public final class Command {
     }
 
     private void remove(final Donation donation) {
-        this.pending.remove(donation);
-        for (final Trigger trigger : this.triggers) trigger.remove(donation);
+        for (final Trigger trigger : this.triggers)
+            trigger.remove(donation);
     }
 
     public Coordinator getCoordinator() {

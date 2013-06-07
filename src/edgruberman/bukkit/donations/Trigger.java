@@ -1,51 +1,63 @@
-package edgruberman.bukkit.donations.triggers;
+package edgruberman.bukkit.donations;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import edgruberman.bukkit.donations.Command;
-import edgruberman.bukkit.donations.Donation;
-
+/** event manager monitors for any associated donation */
 public abstract class Trigger {
 
-    // ---- Static Factory ----
+    // ---- static factory ----
 
-    public static Trigger create(final String className, final Command command, final ConfigurationSection definition) throws ClassNotFoundException, ClassCastException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+    public static final String DEFAULT_PACKAGE = Trigger.class.getPackage().getName() + ".triggers";
+
+    public static Trigger create(final String className, final Command command, final ConfigurationSection definition)
+            throws ClassNotFoundException, ClassCastException, InstantiationException, IllegalAccessException
+            , SecurityException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException
+            {
         final Class<? extends Trigger> subClass = Trigger.find(className);
         final Constructor<? extends Trigger> ctr = subClass.getConstructor(Command.class, ConfigurationSection.class);
         return ctr.newInstance(command, definition);
     }
 
     public static Class<? extends Trigger> find(final String className) throws ClassNotFoundException, ClassCastException {
-        // Look in local package first
         try {
-            return Class.forName(Trigger.class.getPackage().getName() + "." + className).asSubclass(Trigger.class);
+            // look in default package first
+            return Class.forName(Trigger.DEFAULT_PACKAGE + "." + className).asSubclass(Trigger.class);
+
         } catch (final Exception e) {
-            // Ignore to try searching for custom class next
+            // ignore to try searching for custom class next
         }
 
-        // Look for a custom class
+        // look for a custom class
         return Class.forName(className).asSubclass(Trigger.class);
     }
 
 
 
-    // ---- Instance ----
+    // ---- instance ----
 
-    public final Command command;
+    protected final Command command;
 
     protected Trigger(final Command command, final ConfigurationSection definition) {
         this.command = command;
     }
 
-    /** Prepare a trigger to be fired for a processed donation */
+    /** current queue for donations waiting for trigger conditions to be met */
+    public Collection<Donation> getPending() {
+        return Collections.emptyList();
+    }
+
+    /** prepare a trigger to be fired for a processed donation */
     public abstract void add(final Donation donation);
 
-    /** Prevent a trigger from firing in the future for a donation */
+    /** prevent a trigger from firing in the future for a donation */
     public void remove(final Donation donation) {};
 
+    /** perform finalizing cleanup */
     public void clear() {};
 
     public String getName() {

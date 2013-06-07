@@ -206,11 +206,12 @@ public final class Coordinator implements Runnable {
 
         for (final Package pkg : this.packages.values())
             for (final Benefit benefit : pkg.benefits.values())
-                for (final Command command : benefit.commands.values()) {
-                    final List<String> donations = new ArrayList<String>();
-                    for (final Donation donation : command.pending) donations.add(donation.getKey());
-                    if (donations.size() > 0) pending.set(pkg.name + "." + benefit.name + "." + command.name, donations);
-                }
+                for (final Command command : benefit.commands.values())
+                    for (final Trigger trigger : command.triggers) {
+                        final List<String> donations = new ArrayList<String>();
+                        for (final Donation donation : trigger.getPending()) donations.add(donation.getKey());
+                        if (donations.size() > 0) pending.set(pkg.name + "." + benefit.name + "." + command.name, donations);
+                    }
 
         try {
             pending.save(this.pending);
