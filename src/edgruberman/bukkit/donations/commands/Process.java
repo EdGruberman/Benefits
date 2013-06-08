@@ -18,7 +18,7 @@ import edgruberman.bukkit.donations.Processor;
 public final class Process extends Processor implements CommandExecutor {
 
     public Process(final Coordinator coordinator) {
-        super(coordinator);
+        super(coordinator, null);
     }
 
     // usage: /<command> <Donator> <Amount>[ <When>]

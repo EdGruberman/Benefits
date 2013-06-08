@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.event.HandlerList;
 
 import edgruberman.bukkit.donations.commands.Benefits;
 import edgruberman.bukkit.donations.commands.History;
@@ -29,6 +28,7 @@ public final class Main extends CustomPlugin {
     private Coordinator coordinator;
     private BufferedYamlConfiguration assigned;
     private BufferedYamlConfiguration pending;
+    private final List<Processor> processors = new ArrayList<Processor>();
 
     @Override
     public void onLoad() {
@@ -41,9 +41,12 @@ public final class Main extends CustomPlugin {
         this.reloadConfig();
         Main.courier = ConfigurationCourier.create(this).setBase(this.loadConfig("language.yml")).setFormatCode("format-code").build();
 
+
         // initialize offline player names with proper casing in cache
         Bukkit.getServer().getOfflinePlayers();
 
+
+        // coordinator
         this.coordinator = new Coordinator(this);
 
         this.loadPackages(this.loadConfig(Main.PACKAGES_FILE));
@@ -54,6 +57,26 @@ public final class Main extends CustomPlugin {
         this.pending = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "pending.yml"), 5000);
         this.loadPending(this.pending);
 
+
+        // processors
+        final ConfigurationSection processorsConfig = this.getConfig().getConfigurationSection("processors");
+        for (final String key : processorsConfig.getKeys(false)) {
+            final ConfigurationSection config = processorsConfig.getConfigurationSection(key);
+            if (!config.getBoolean("enable")) continue;
+
+            final String processorClass = config.getString("class", key);
+            final Processor processor;
+            try {
+                processor = Processor.create(processorClass, this.coordinator, config);
+            } catch (final Exception e) {
+                this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}", new Object[] { processorClass, e });
+                continue;
+            }
+            this.processors.add(processor);
+        }
+
+
+        // commands
         this.getCommand("donations:history").setExecutor(new History(this.coordinator));
         this.getCommand("donations:benefits").setExecutor(new Benefits(this.coordinator));
         this.getCommand("donations:process").setExecutor(new Process(this.coordinator));
@@ -63,8 +86,8 @@ public final class Main extends CustomPlugin {
 
     @Override
     public void onDisable() {
-        HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().cancelTasks(this);
+        for (final Processor processor : this.processors) processor.stop();
+        this.processors.clear();
 
         this.coordinator.clear();
         this.coordinator = null;
