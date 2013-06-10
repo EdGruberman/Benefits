@@ -7,7 +7,13 @@ import java.util.Comparator;
 /** record of money being granted */
 public final class Donation {
 
-    /** fully qualified class name of payment processor */
+    public static String createKey(final String processor, final String id) {
+        return processor + ":" + id;
+    }
+
+
+
+    /** unique payment processor identifier */
     public final String processor;
 
     /** payment processor specific unique identifier */
@@ -31,8 +37,8 @@ public final class Donation {
     private final String key;
 
     /** new, unassigned, incoming donation */
-    public Donation(final String processor, final String id, final String origin, final String player, final double amount, final long contributed) {
-        this(processor, id, origin, player, amount, contributed, null);
+    public Donation(final Processor processor, final String id, final String origin, final String player, final double amount, final long contributed) {
+        this(processor.getId(), id, origin, player, amount, contributed, null);
     }
 
     /** existing donation with packages already applied */
@@ -45,7 +51,7 @@ public final class Donation {
         this.contributed = contributed;
         if (packages != null) this.packages.addAll(packages);
 
-        this.key = this.processor.toLowerCase() + "-" + this.id;
+        this.key = Donation.createKey(processor, id);
     }
 
     /** (Processor)-(ID) */

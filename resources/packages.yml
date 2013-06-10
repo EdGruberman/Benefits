@@ -1,7 +1,7 @@
 # commands: 0 = Player, 1 = Amount, 2 = Contributed, 3 = Donation Key
 Donator:
     description: Recognition for server support
-    minimum: 5.00
+    minimum: 500
     limit: 0
     benefits:
         Confirmation:
@@ -39,7 +39,7 @@ Donator:
                     undo: 'kitteh:kit.revoke Sponges {0} {1,number,#}'
 Supporter:
     description: Additional benefits
-    minimum: 10.00
+    minimum: 1000
     limit: 30 # days
     benefits:
         Chat Color Codes:

@@ -51,7 +51,7 @@ public abstract class Processor {
     }
 
     public String getId() {
-        return this.getClass().getName();
+        return this.getClass().getSimpleName();
     }
 
     /** called to cease any further processing */

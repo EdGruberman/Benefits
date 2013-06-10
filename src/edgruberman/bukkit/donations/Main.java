@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -32,18 +31,14 @@ public final class Main extends CustomPlugin {
 
     @Override
     public void onLoad() {
-        this.putConfigMinimum("0.0.0a78");
-        this.putConfigMinimum(Main.PACKAGES_FILE, "0.0.0a78");
+        this.putConfigMinimum("0.0.0a98");
+        this.putConfigMinimum(Main.PACKAGES_FILE, "0.0.0a84");
     }
 
     @Override
     public void onEnable() {
         this.reloadConfig();
         Main.courier = ConfigurationCourier.create(this).setBase(this.loadConfig("language.yml")).setFormatCode("format-code").build();
-
-
-        // initialize offline player names with proper casing in cache
-        Bukkit.getServer().getOfflinePlayers();
 
 
         // coordinator
@@ -70,6 +65,7 @@ public final class Main extends CustomPlugin {
                 processor = Processor.create(processorClass, this.coordinator, config);
             } catch (final Exception e) {
                 this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}", new Object[] { processorClass, e });
+                this.getLogger().log(Level.FINE, "", e);
                 continue;
             }
             this.processors.add(processor);
@@ -94,6 +90,9 @@ public final class Main extends CustomPlugin {
 
         Main.courier = null;
     }
+
+
+    // -- repository methods --
 
     // TODO check for duplicates while loading and send warning to log
     private void loadPackages(final Configuration packages) {

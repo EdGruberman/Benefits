@@ -34,7 +34,7 @@ public final class Coordinator {
     }
 
     /** @param name lower case Package name */
-    Package getPackage(final String name) {
+    public Package getPackage(final String name) {
         return this.packages.get(name);
     }
 
@@ -42,11 +42,14 @@ public final class Coordinator {
         this.assigned.put(donation.getKey(), donation);
     }
 
-    Donation getAssigned(final String key) {
+    public Donation getAssigned(final String key) {
         return this.assigned.get(key);
     }
 
     public void assign(final Donation donation) {
+        // TODO sandbox mode
+        // TODO logging
+
         // ensure no duplicate processing even if a problem occurs
         this.assigned.put(donation.getKey(), donation);
 
