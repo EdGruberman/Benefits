@@ -44,9 +44,10 @@ permissions:
     description: Can use all features
     default: op
     children:
-      donations.info: true
+      donations.user: true
       donations.process: true
       donations.undo: true
+      donations.sandbox: true
       donations.reload: true
   donations.history:
     description: Can use history command
@@ -59,6 +60,9 @@ permissions:
     default: false
   donations.undo:
     description: Can use undo command
+    default: false
+  donations.sandbox:
+    description: Can use sandbox command
     default: false
   donations.reload:
     description: Can use reload command
