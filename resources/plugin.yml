@@ -4,42 +4,57 @@ description: Manages donation benefits
 author: EdGruberman (ed@rjump.com)
 main: edgruberman.bukkit.donations.Main
 commands:
-    'donations:history':
-        aliases: [donations, donations.history]
-        description: Show donation history
-        permission: donations.history
-        usage: /<command>[ <Page>][ <Donator>]
-    'donations:benefits':
-        aliases: [benefits, donations.benefits]
-        description: Show package/benefit detail
-        permission: donations.benefits
-        usage: /<command>[ <Package>]
-    'donations:process':
-        aliases: [process, donations.process]
-        description: Record and apply a donation
-        permission: donations.process
-        usage: /<command> <Donator> <Amount>[ <When>]
-    'donations:undo':
-        aliases: [donations.undo]
-        description: Revert applied package, benefit, or command for donation
-        permission: donations.undo
-        usage: /<command> <Donation> <Package>[ <Benefit>[ <Command>]]
-    'donations:reload':
-        description: Reload Donations plugin
-        permission: donations.reload
-        usage: /<command>
+  'donations:history':
+    aliases: [donations, donations.history]
+    description: Show donation history
+    permission: donations.history
+    usage: '§f-> §7Usage: §b§l/<command> §3[§opage§3] [§odonator§3]'
+  'donations:benefits':
+    aliases: [benefits, donations.benefits]
+    description: Show package/benefit detail
+    permission: donations.benefits
+    usage: '§f-> §7Usage: §b§l/<command> §3[§opackage§3]'
+  'donations:process':
+    aliases: [process, donations.process]
+    description: Record and apply a donation
+    permission: donations.process
+    usage: '§f-> §7Usage: §b§l/<command> §3§odonator amount §3[§owhen§3]'
+  'donations:undo':
+    aliases: [donations.undo]
+    description: Revert applied package, benefit, or command for donation
+    permission: donations.undo
+    usage: '§f-> §7Usage: §b§l/<command> §3§odonation package §3[§obenefit §3[§ocommand§3]]'
+  'donations:reload':
+    description: Reload Donations plugin
+    permission: donations.reload
+    usage: '§f-> §7Usage: §b§l/<command>'
 permissions:
-    donations.info:
-        description: Can use basic information commands
-        default: true
-        children:
-            donations.history: true
-            donations.benefits: true
-    donations.admin:
-        description: Can use all commands
-        default: op
-        children:
-            donations.info: true
-            donations.process: true
-            donations.undo: true
-            donations.reload: true
+  donations.user:
+    description: Can use basic features
+    default: true
+    children:
+      donations.history: true
+      donations.benefits: true
+  donations.admin:
+    description: Can use all features
+    default: op
+    children:
+      donations.info: true
+      donations.process: true
+      donations.undo: true
+      donations.reload: true
+  donations.history:
+    description: Can use history command
+    default: false
+  donations.benefits:
+    description: Can use benefits command
+    default: false
+  donations.process:
+    description: Can use process command
+    default: false
+  donations.undo:
+    description: Can use undo command
+    default: false
+  donations.reload:
+    description: Can use reload command
+    default: false
