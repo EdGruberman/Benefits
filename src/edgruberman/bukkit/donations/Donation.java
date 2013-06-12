@@ -1,5 +1,6 @@
 package edgruberman.bukkit.donations;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Comparator;
 
@@ -77,7 +78,12 @@ public final class Donation {
 
     @Override
     public String toString() {
-        return "Donation [origin=" + this.origin + ", playerName=" + this.player + ", amount=" + this.amount + ", contributed=" + this.contributed + "]";
+        return MessageFormat.format("Donation [processor={0},id={1},origin={2}, playerName={3}, amount={4}, contributed={5}]"
+                , this.processor, this.id, this.origin, this.player, this.amount, this.contributed);
+    }
+
+    public Donation as(final String player) {
+        return new Donation(this.processor, this.id, this.origin, player, this.amount, this.contributed, this.packages);
     }
 
 

@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,13 +12,15 @@ import org.bukkit.command.CommandSender;
 import edgruberman.bukkit.donations.Coordinator;
 import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
-import edgruberman.bukkit.donations.Processor;
+import edgruberman.bukkit.donations.processors.SlashCommand;
 import edgruberman.bukkit.donations.util.JoinList;
 
-public final class Process extends Processor implements CommandExecutor {
+public final class Process implements CommandExecutor {
+
+    SlashCommand processor;
 
     public Process(final Coordinator coordinator) {
-        super(coordinator, null);
+        this.processor = new SlashCommand(coordinator, null);
     }
 
     // usage: /<command> <Donator> <Amount>[ <When>]
@@ -36,11 +37,12 @@ public final class Process extends Processor implements CommandExecutor {
         }
 
         final String donator = args[0];
-        final Long amount = Process.parseLong(args[1]);
+        Long amount = Process.parseLong(args[1]);
         if (amount == null) {
             Main.courier.send(sender, "unknown-argument", "amount", false, args[1]);
             return false;
         }
+        amount = amount * 100;
 
         final Date when = (args.length >= 3 ? Process.parseDate(args[2]) : new Date());
         if (when == null) {
@@ -48,9 +50,9 @@ public final class Process extends Processor implements CommandExecutor {
             return false;
         }
 
-        final Donation donation = this.process(UUID.randomUUID().toString(), sender.getName(), donator, amount, when.getTime());
+        final Donation donation = this.processor.process(sender.getName(), donator, amount, when.getTime());
         final List<String> packages = new JoinList<String>(Main.courier.getSection("process.packages"), donation.packages);
-        Main.courier.send(sender, "process.success", donator, amount, packages);
+        Main.courier.send(sender, "process.success", donator, amount / 100D, packages);
         return true;
     }
 

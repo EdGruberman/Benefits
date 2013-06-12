@@ -5,7 +5,7 @@ processors:
     email: ed@rjump.com
     currency: USD
     listen-ip: 0.0.0.0
-    listen-port: 80
+    listen-port: 80 # PayPal currently only supports the default port of 80
     whitelist: [notify.paypal.com]
     validator: https://www.paypal.com/cgi-bin/webscr
 version: @VERSION@

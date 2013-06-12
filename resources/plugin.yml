@@ -29,6 +29,11 @@ commands:
     description: Toggle sandbox mode on or off
     permission: donations.sandbox
     usage: '§f-> §7Usage: §b§l/<command> §3[§lon§3|§loff§3]'
+  'donations:register':
+    aliases: [register, donations.register]
+    description: Associate a donation origin (e-mail) with a player
+    permission: donations.register
+    usage: '§f-> §7Usage: §b§l/<command> §3§oorigin §3[§oplayer§3]'
   'donations:reload':
     description: Reload Donations plugin
     permission: donations.reload
@@ -48,6 +53,7 @@ permissions:
       donations.process: true
       donations.undo: true
       donations.sandbox: true
+      donations.register: true
       donations.reload: true
   donations.history:
     description: Can use history command
@@ -63,6 +69,9 @@ permissions:
     default: false
   donations.sandbox:
     description: Can use sandbox command
+    default: false
+  donations.register:
+    description: Can use register command
     default: false
   donations.reload:
     description: Can use reload command

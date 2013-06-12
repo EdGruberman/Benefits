@@ -87,7 +87,7 @@ public final class Undo extends Executor {
 
         this.coordinator.savePending();
         Main.courier.send(sender, "undo.success"
-                , donation.player, donation.amount, new Date(donation.contributed)
+                , donation.player, donation.amount / 100D, new Date(donation.contributed)
                 , new JoinList<String>(Main.courier.getSection("undo.commands"), removed));
 
         return true;

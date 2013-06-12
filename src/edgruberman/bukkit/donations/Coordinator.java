@@ -12,11 +12,14 @@ import org.bukkit.plugin.Plugin;
 /** manages benefit distribution */
 public final class Coordinator {
 
-    /** Package name, Package */
+    /** lower case package name, Package */
     public final Map<String, Package> packages = new HashMap<String, Package>();
 
-    /** Donation key, Donation */
+    /** donation key, Donation */
     public final Map<String, Donation> donations = new HashMap<String, Donation>();
+
+    /** lower case donation origin, lower case player name */
+    public final Map<String, String> registrations = new HashMap<String, String>();
 
     public final Plugin plugin;
 
@@ -38,9 +41,10 @@ public final class Coordinator {
         for (final Package pkg : this.packages.values()) pkg.clear();
         this.packages.clear();
         this.donations.clear();
+        this.registrations.clear();
     }
 
-    void addPackage(final Package pkg) {
+    void putPackage(final Package pkg) {
         this.packages.put(pkg.name.toLowerCase(), pkg);
     }
 
@@ -49,37 +53,66 @@ public final class Coordinator {
         return this.packages.get(name);
     }
 
-    void addDonation(final Donation donation) {
-        this.donations.put(donation.getKey(), donation);
+    Donation putDonation(final Donation donation) {
+        return this.donations.put(donation.getKey(), donation);
     }
 
     public Donation getDonation(final String key) {
         return this.donations.get(key);
     }
 
+    public String putRegistration(final String origin, final String player) {
+        final String previous = this.registrations.put(origin, player);
+        ((Main) this.plugin).saveRegistration(origin, player);
+
+        for (final Donation donation : this.unassigned(origin)) {
+            final Donation updated = donation.as(player);
+            this.putDonation(updated);
+            this.assign(updated);
+        }
+
+        return previous;
+    }
+
     public void assign(final Donation donation) {
         this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] } Donation: {1}", new Object[] { this.sandbox?1:0, donation });
         if (!this.sandbox) this.donations.put(donation.getKey(), donation);
 
-        final List<Package> applicable = this.applicable(donation);
+        // do not attempt assignment if player not identified yet
+        if (donation.player == null) {
+            if (!this.sandbox) ((Main) this.plugin).saveDonation(donation);
+            return;
+        }
 
-        final List<String> assigned = new ArrayList<String>();
-        for (final Package pkg : applicable) {
-            assigned.add(pkg.name);
+        donation.packages = new ArrayList<String>();
+        for (final Package pkg : this.applicable(donation)) {
+            if (!this.sandbox) donation.packages.add(pkg.name);
             for (final Benefit benefit : pkg.benefits.values()) {
                 for (final Command command : benefit.commands.values()) {
                     if (!this.sandbox) command.add(donation);
-                    this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] } {0,choice,0#Assigned|1#Applicable}: {1}"
+                    this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] }   {0,choice,0#Assigned|1#Applicable}: {1}"
                             , new Object[] { this.sandbox?1:0, pkg, command });
                 }
             }
         }
 
-        if (this.sandbox) return;
+        if (!this.sandbox) {
+            ((Main) this.plugin).saveDonation(donation);
+            this.savePending();
+        }
+    }
 
-        donation.packages = assigned;
-        ((Main) this.plugin).saveAssigned(donation);
-        this.savePending();
+    /** unassigned donations for a given player ordered by oldest contribution first */
+    public List<Donation> unassigned(final String origin) {
+        final String lower = origin.toLowerCase();
+
+        final List<Donation> result = new ArrayList<Donation>();
+        for (final Donation donation : this.donations.values())
+            if (donation.player == null && donation.origin.toLowerCase().equals(lower) && donation.packages == null)
+                result.add(donation);
+
+        Collections.sort(result, Collections.reverseOrder(Donation.NEWEST_CONTRIBUTION_FIRST));
+        return result;
     }
 
     /** assigned donations for a given player ordered by newest contribution first */

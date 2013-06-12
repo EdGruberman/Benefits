@@ -54,7 +54,7 @@ public final class History implements CommandExecutor {
             final List<String> packages = new JoinList<String>(Main.courier.getSection("history.packages"), donation.packages);
             final long days = TimeUnit.MILLISECONDS.toDays(now - donation.contributed);
             System.out.println(donation.amount);
-            Main.courier.send(sender, "history.donation", new Date(donation.contributed), days, donation.amount, packages);
+            Main.courier.send(sender, "history.donation", new Date(donation.contributed), days, donation.amount / 100D, packages);
         }
 
         final long oldest = TimeUnit.MILLISECONDS.toDays(now - history.get(0).contributed);

@@ -19,6 +19,7 @@ import edgruberman.bukkit.donations.Trigger;
 
 public abstract class PlayerEvent extends Trigger implements Listener {
 
+    /** lower case player name, donations */
     protected final Map<String, List<Donation>> pending = new HashMap<String, List<Donation>>();
 
     private boolean registered = false;
