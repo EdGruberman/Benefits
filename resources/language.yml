@@ -28,6 +28,7 @@ remove:
   commands:
     +item: '{0}' # 0 = Command
     +delim: ', '
+sandbox: '§f-> Donations are now {1,choice,0#assigned as live|1#only logged in sandbox mode}' # 0 = Generated, 1 = Sandbox(0|1)
 requires-argument: '§f-> §cMissing §7required argument: §b§o{1}' # 0 = Generated, 1 = Argument Name
 unknown-argument: '§f-> §eUnknown§f value for §b§o{1}§7: §f{2}' # 0 = Generated, 1 = Argument Name, 2 = Argument Value
 reload: '§f-> §2Reloaded §7{1} plugin' # 0 = Generated, 1 = Plugin Name
