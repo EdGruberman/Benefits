@@ -110,7 +110,7 @@ public final class Main extends CustomPlugin {
             final ConfigurationSection entry = assigned.getConfigurationSection(key);
 
             final Donation donation = new Donation(entry.getString("processor"), entry.getString("id"), entry.getString("origin")
-                    , entry.getString("player") , entry.getDouble("amount"), entry.getLong("contributed"), entry.getStringList("packages"));
+                    , entry.getString("player") , entry.getLong("amount"), entry.getLong("contributed"), entry.getStringList("packages"));
 
             this.coordinator.addDonation(donation);
             this.getLogger().log(Level.FINEST, "Loaded assigned donation: " + donation.getKey() + " = " + donation.toString());

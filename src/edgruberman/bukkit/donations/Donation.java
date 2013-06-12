@@ -25,7 +25,7 @@ public final class Donation {
     public final String player;
 
     /** financial total donated (USD) */
-    public final double amount;
+    public final long amount;
 
     /** when donation was made in milliSeconds from midnight, January 1, 1970 UTC */
     public final Long contributed;
@@ -36,12 +36,12 @@ public final class Donation {
     private final String key;
 
     /** new, unassigned, incoming donation */
-    public Donation(final Processor processor, final String id, final String origin, final String player, final double amount, final long contributed) {
+    public Donation(final Processor processor, final String id, final String origin, final String player, final long amount, final long contributed) {
         this(processor.getId(), id, origin, player, amount, contributed, null);
     }
 
     /** existing donation with packages already applied */
-    public Donation(final String processor, final String id, final String origin, final String player, final double amount, final long contributed, final Collection<String> packages) {
+    public Donation(final String processor, final String id, final String origin, final String player, final long amount, final long contributed, final Collection<String> packages) {
         this.processor = processor;
         this.id = id;
         this.origin = origin;

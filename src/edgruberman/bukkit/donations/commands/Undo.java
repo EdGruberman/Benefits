@@ -13,6 +13,7 @@ import edgruberman.bukkit.donations.Coordinator;
 import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
 import edgruberman.bukkit.donations.Package;
+import edgruberman.bukkit.donations.util.JoinList;
 
 public final class Undo extends Executor {
 
@@ -26,24 +27,24 @@ public final class Undo extends Executor {
     @Override
     protected boolean execute(final CommandSender sender, final org.bukkit.command.Command command, final String label, final List<String> args) {
         if (args.size() < 1) {
-            Main.courier.send(sender, "requires-argument", "<Donation>");
+            Main.courier.send(sender, "requires-argument", "donation", false);
             return false;
         }
 
         final Donation donation = this.coordinator.getDonation(args.get(0));
         if (donation == null) {
-            Main.courier.send(sender, "unknown-argument", "<Donation>", args.get(0));
+            Main.courier.send(sender, "unknown-argument", "donation", false, args.get(0));
             return false;
         }
 
         if (args.size() < 2) {
-            Main.courier.send(sender, "requires-argument", "<Package>");
+            Main.courier.send(sender, "requires-argument", "package", false);
             return false;
         }
 
         final Package pkg = this.coordinator.packages.get(args.get(1).toLowerCase());
         if (pkg == null) {
-            Main.courier.send(sender, "unknown-argument", "<Package>", args.get(1));
+            Main.courier.send(sender, "unknown-argument", "package", false, args.get(1));
             return false;
         }
 
@@ -51,7 +52,7 @@ public final class Undo extends Executor {
         if (args.size() >= 3) {
             benefit = pkg.benefits.get(args.get(2).toLowerCase());
             if (benefit == null) {
-                Main.courier.send(sender, "unknown-argument", "<Benefit>", args.get(2));
+                Main.courier.send(sender, "unknown-argument", "benefit", false, args.get(2));
                 return false;
             }
         }
@@ -60,7 +61,7 @@ public final class Undo extends Executor {
         if (args.size() >= 4) {
             cmd = benefit.commands.get(args.get(3).toLowerCase());
             if (cmd == null) {
-                Main.courier.send(sender, "unknown-argument", "<Command>", args.get(3));
+                Main.courier.send(sender, "unknown-argument", "command", false, args.get(3));
                 return false;
             }
         }
@@ -85,24 +86,12 @@ public final class Undo extends Executor {
         }
 
         this.coordinator.savePending();
-        Main.courier.send(sender, "remove.success"
+        Main.courier.send(sender, "undo.success"
                 , donation.player, donation.amount, new Date(donation.contributed)
-                , Undo.join(removed, "remove.commands"));
+                , new JoinList<String>(Main.courier.getSection("undo.commands"), removed));
 
         return true;
 
-    }
-
-    private static String join(final Collection<? extends String> col, final String path) {
-        if (col == null || col.isEmpty()) return "";
-
-        final StringBuilder sb = new StringBuilder();
-        for (final String s : col) {
-            if (sb.length() > 0) sb.append(Main.courier.format(path + ".+delim"));
-            sb.append(Main.courier.format(path + ".+item", s));
-        }
-
-        return sb.toString();
     }
 
 }
