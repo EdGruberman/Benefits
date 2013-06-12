@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.plugin.Plugin;
 
@@ -15,18 +16,28 @@ public final class Coordinator {
     public final Map<String, Package> packages = new HashMap<String, Package>();
 
     /** Donation key, Donation */
-    public final Map<String, Donation> assigned = new HashMap<String, Donation>();
+    public final Map<String, Donation> donations = new HashMap<String, Donation>();
 
     public final Plugin plugin;
+
+    private boolean sandbox = false;
 
     Coordinator(final Plugin plugin) {
         this.plugin = plugin;
     }
 
+    public boolean isSandbox() {
+        return this.sandbox;
+    }
+
+    public void setSandbox(final boolean enable) {
+        this.sandbox = enable;
+    }
+
     void clear() {
         for (final Package pkg : this.packages.values()) pkg.clear();
         this.packages.clear();
-        this.assigned.clear();
+        this.donations.clear();
     }
 
     void addPackage(final Package pkg) {
@@ -38,42 +49,50 @@ public final class Coordinator {
         return this.packages.get(name);
     }
 
-    void addAssigned(final Donation donation) {
-        this.assigned.put(donation.getKey(), donation);
+    void addDonation(final Donation donation) {
+        this.donations.put(donation.getKey(), donation);
     }
 
-    public Donation getAssigned(final String key) {
-        return this.assigned.get(key);
+    public Donation getDonation(final String key) {
+        return this.donations.get(key);
     }
 
     public void assign(final Donation donation) {
-        // TODO sandbox mode
-        // TODO logging
+        this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] } Donation: {1}", new Object[] { this.sandbox?1:0, donation });
+        if (!this.sandbox) this.donations.put(donation.getKey(), donation);
 
-        // ensure no duplicate processing even if a problem occurs
-        this.assigned.put(donation.getKey(), donation);
+        final List<Package> applicable = this.applicable(donation);
 
-        for (final Package pkg : this.applicable(donation)) {
-            donation.packages.add(pkg.name);
-            for (final Benefit benefit : pkg.benefits.values())
-                for (final Command command : benefit.commands.values())
-                    command.add(donation);
+        final List<String> assigned = new ArrayList<String>();
+        for (final Package pkg : applicable) {
+            assigned.add(pkg.name);
+            for (final Benefit benefit : pkg.benefits.values()) {
+                for (final Command command : benefit.commands.values()) {
+                    if (!this.sandbox) command.add(donation);
+                    this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] } {0,choice,0#Assigned|1#Applicable}: {1}"
+                            , new Object[] { this.sandbox?1:0, pkg, command });
+                }
+            }
         }
 
+        if (this.sandbox) return;
+
+        donation.packages = assigned;
         ((Main) this.plugin).saveAssigned(donation);
         this.savePending();
     }
 
-    // TODO include pending
     /** assigned donations for a given player ordered by newest contribution first */
     public List<Donation> history(final String player) {
-        final List<Donation> history = new ArrayList<Donation>();
-        for (final Donation donation : this.assigned.values())
-            if (donation.player.equalsIgnoreCase(player))
-                history.add(donation);
+        final String lower = player.toLowerCase();
 
-        Collections.sort(history, Donation.NEWEST_CONTRIBUTION_FIRST);
-        return history;
+        final List<Donation> result = new ArrayList<Donation>();
+        for (final Donation donation : this.donations.values())
+            if (donation.player != null && donation.player.toLowerCase().equals(lower))
+                result.add(donation);
+
+        Collections.sort(result, Donation.NEWEST_CONTRIBUTION_FIRST);
+        return result;
     }
 
     /** packages to be applied for a given donation amount ordered by lowest minimum first */

@@ -30,7 +30,7 @@ public final class Undo extends Executor {
             return false;
         }
 
-        final Donation donation = this.coordinator.assigned.get(args.get(0).toLowerCase());
+        final Donation donation = this.coordinator.getDonation(args.get(0));
         if (donation == null) {
             Main.courier.send(sender, "unknown-argument", "<Donation>", args.get(0));
             return false;

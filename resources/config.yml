@@ -1,5 +1,4 @@
 log-level: ALL
-sandbox: false
 processors:
   PayPal:
     enable: true
@@ -7,6 +6,6 @@ processors:
     listen-ip: 0.0.0.0
     listen-port: 25580
     currency: USD
-    whitelist: [notify.paypal.com] # ipn.sandbox.paypal.com
-    validator: https://www.paypal.com/cgi-bin/webscr # https://www.sandbox.paypal.com/cgi-bin/webscr
+    whitelist: [notify.paypal.com]
+    validator: https://www.paypal.com/cgi-bin/webscr
 version: @VERSION@

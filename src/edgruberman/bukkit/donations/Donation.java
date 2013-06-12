@@ -1,6 +1,5 @@
 package edgruberman.bukkit.donations;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
@@ -32,7 +31,7 @@ public final class Donation {
     public final Long contributed;
 
     /** package names applied to donation */
-    public Collection<String> packages = new ArrayList<String>();
+    public Collection<String> packages;
 
     private final String key;
 
@@ -49,7 +48,7 @@ public final class Donation {
         this.player = player;
         this.amount = amount;
         this.contributed = contributed;
-        if (packages != null) this.packages.addAll(packages);
+        this.packages = packages;
 
         this.key = Donation.createKey(processor, id);
     }

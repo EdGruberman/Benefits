@@ -43,6 +43,7 @@ public final class Main extends CustomPlugin {
 
         // coordinator
         this.coordinator = new Coordinator(this);
+        this.coordinator.setSandbox(this.getConfig().getBoolean("sandbox"));
 
         this.loadPackages(this.loadConfig(Main.PACKAGES_FILE));
 
@@ -111,7 +112,7 @@ public final class Main extends CustomPlugin {
             final Donation donation = new Donation(entry.getString("processor"), entry.getString("id"), entry.getString("origin")
                     , entry.getString("player") , entry.getDouble("amount"), entry.getLong("contributed"), entry.getStringList("packages"));
 
-            this.coordinator.addAssigned(donation);
+            this.coordinator.addDonation(donation);
             this.getLogger().log(Level.FINEST, "Loaded assigned donation: " + donation.getKey() + " = " + donation.toString());
         }
     }
@@ -138,7 +139,7 @@ public final class Main extends CustomPlugin {
                 for (final String commandName : commands.getKeys(false)) {
 
                     for (final String donationKey : commands.getStringList(commandName)) {
-                        final Donation donation = this.coordinator.getAssigned(donationKey);
+                        final Donation donation = this.coordinator.getDonation(donationKey);
                         if (donation == null) {
                             this.getLogger().warning("Unable to find donation " + donationKey + " to add to " + packageName + "." + benefitName + "." + commandName);
                             continue;
