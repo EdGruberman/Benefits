@@ -55,7 +55,7 @@ public abstract class Trigger {
     public abstract void add(final Donation donation);
 
     /** prevent a trigger from firing in the future for a donation */
-    public void remove(final Donation donation) {};
+    public boolean remove(final Donation donation) { return true; };
 
     /** perform finalizing cleanup */
     public void clear() {};
@@ -65,7 +65,7 @@ public abstract class Trigger {
     }
 
     public String getPath() {
-        return this.command.getPath() + ".\"" + this.getName() + "\"";
+        return this.command.getPath() + ">\"" + this.getName() + "\"";
     }
 
     @Override

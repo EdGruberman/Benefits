@@ -5,6 +5,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -38,21 +41,30 @@ public class NotificationListener implements HttpHandler, Runnable {
     private final PayPal processor;
     private final Plugin plugin;
     private final Logger logger;
+
     private final HttpServer server;
     private final HttpWhitelist whitelist;
+    private final HttpValidator validator;
 
     private final Queue<InstantPaymentNotification> pending = new ConcurrentLinkedQueue<InstantPaymentNotification>();
     private int taskId = -1;
     private final Object lock = new Object();
     private boolean stopping = false;
 
-    /** @param whitelist allowed remote host name */
-    public NotificationListener(final PayPal processor, final Plugin plugin, final String validator, final InetSocketAddress bind, final List<String> whitelist) throws IOException {
+    /**
+     * @param whitelist allowed remote host name
+     * @throws UnknownHostException if whitelist has an invalid address
+     * @throws MalformedURLException if validator is an invalid address
+     * @throws IOException for any exception while attempting to create HTTP server
+     */
+    public NotificationListener(final PayPal processor, final Plugin plugin, final String validator, final InetSocketAddress bind, final List<String> whitelist)
+            throws UnknownHostException, MalformedURLException, IOException {
         this.processor = processor;
         this.plugin = plugin;
         this.logger = new SynchronousPluginLogger(plugin).setPattern("[PayPal] {0}");
 
         this.whitelist = ( whitelist != null ? new HttpWhitelist(this.logger, whitelist) : null );
+        this.validator = new HttpValidator(this.logger, validator);
 
         this.server = HttpServer.create(bind, -1);
         final HttpContext context = this.server.createContext("/", this);
@@ -60,7 +72,7 @@ public class NotificationListener implements HttpHandler, Runnable {
         if (this.whitelist != null) context.getFilters().add(this.whitelist);
         context.getFilters().add(new HttpMethodAccepter(this.logger, "POST"));
         context.getFilters().add(new HttpBodyParser(this.logger, NotificationListener.BUFFER, NotificationListener.MEDIAN, NotificationListener.LIMIT));
-        context.getFilters().add(new HttpValidator(this.logger, validator));
+        context.getFilters().add(this.validator);
 
         this.server.start();
     }
@@ -82,6 +94,10 @@ public class NotificationListener implements HttpHandler, Runnable {
 
     public InetSocketAddress getAddress() {
         return this.server.getAddress();
+    }
+
+    public URL getValidator() {
+        return this.validator.getValidator();
     }
 
     public Set<InetAddress> getWhitelist() {

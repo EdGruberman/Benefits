@@ -49,6 +49,11 @@ public final class Package {
         return "\"" + this.name + "\"";
     }
 
+    @Override
+    public String toString() {
+        return this.getPath();
+    }
+
     public boolean applicable(final Donation donation) {
         if (donation.amount < this.minimum) return false;
 

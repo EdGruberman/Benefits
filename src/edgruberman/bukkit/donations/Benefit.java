@@ -33,7 +33,7 @@ public final class Benefit {
     }
 
     public String getPath() {
-        return this.pkg.getPath() + ".\"" + this.name + "\"";
+        return this.pkg.getPath() + ">\"" + this.name + "\"";
     }
 
 }

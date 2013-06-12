@@ -23,11 +23,16 @@ class HttpValidator extends Filter {
     private static final int LIMIT = 16; // size in bytes that is large enough to hold either VERIFIED or INVALID in UTF-8 encoding
 
     private final Logger logger;
-    private final String validator;
+    private final URL validator;
 
-    HttpValidator(final Logger logger, final String validator) {
+    /** @param validator URL to PayPal IPN verification API */
+    HttpValidator(final Logger logger, final String validator) throws MalformedURLException {
         this.logger = logger;
-        this.validator = validator;
+        this.validator = new URL(validator);
+    }
+
+    public URL getValidator() {
+        return this.validator;
     }
 
     @Override
@@ -62,14 +67,13 @@ class HttpValidator extends Filter {
      * @param limit maximum size in bytes of response to return, -1 for no limit
      * @return response body
      */
-    private static String post(final String destination, final String content, final int limit) throws MalformedURLException, ProtocolException, IOException {
+    private static String post(final URL remote, final String content, final int limit) throws ProtocolException, IOException {
         final byte[] bytes = content.getBytes("UTF-8");
 
         CharBuffer result = null;
         HttpURLConnection connection = null;
         try {
-            final URL url = new URL(destination);
-            connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) remote.openConnection();
 
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

@@ -1,9 +1,9 @@
 log-level: ALL
+currency: USD # if this is changed after receiving donations, donations.yml and pending.yml must be manually cleaned out
 processors:
   PayPal:
     enable: true
     email: ed@rjump.com
-    currency: USD
     listen-ip: 0.0.0.0
     listen-port: 80 # PayPal currently only supports the default port of 80
     whitelist: [notify.paypal.com]

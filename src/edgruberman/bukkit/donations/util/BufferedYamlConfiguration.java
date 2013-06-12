@@ -14,7 +14,7 @@ import org.bukkit.plugin.Plugin;
  * queues save requests to prevent occurring more than a maximum rate
  *
  * @author EdGruberman (ed@rjump.com)
- * @version 2.2.0
+ * @version 2.3.0
  */
 public class BufferedYamlConfiguration extends YamlConfiguration implements Runnable {
 
@@ -133,6 +133,10 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
 
     public void cancelSave() {
         Bukkit.getScheduler().cancelTask(this.taskSave);
+    }
+
+    public void clear() {
+        this.map.clear();
     }
 
 }

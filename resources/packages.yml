@@ -1,4 +1,4 @@
-# commands: 0 = Player, 1 = Amount, 2 = Contributed, 3 = Donation Key
+# commands: 0 = player, 1 = currency, 2 = amount, 3 = amount rounded down, 4 = contributed, 5 = donation key
 Donator:
   description: Recognition for server support
   minimum: 500
@@ -10,14 +10,14 @@ Donator:
         Message:
           triggers: [Online]
           dispatch:
-            - 'messageformatter:send {0} §2§k####§r Thank you for your §a${1,number,#.##}§r donation!'
+            - 'messageformatter:send {0} §2§k####§r Thank you for your §a{1} {2,number,0.00}§r donation!'
             - 'messageformatter:send {0} §2§k####§r Donators such as yourself keep this server running!'
-            - 'donations:undo {3} Donor Confirmation'
+            - 'donations:undo {5} Donor Confirmation'
         Expire:
           triggers: [Delay]
           delay: 2592000 # seconds (30 days)
           tolerance: 43200 # seconds (12 hours)
-          dispatch: 'donations:undo {3} Donor Confirmation'
+          dispatch: 'donations:undo {5} Donor Confirmation'
     Chat Name Color:
       description: Colored display name in chat
       commands:
@@ -29,14 +29,14 @@ Donator:
           triggers: [Delay]
           delay: 2592000
           tolerance: 30
-          dispatch: 'donations:undo {3} Donor "Chat Name Color"'
+          dispatch: 'donations:undo {5} Donor "Chat Name Color"'
     Sponges:
       description: Sponges do nothing, but they sure do look odd!
       commands:
         Grant:
           triggers: [Instant]
-          dispatch: 'kitteh:kit.grant Sponges {0} {1,number,#} "Thank you for your ${1,number,#.##} donation on {2,date,yyyy MMM dd hh:mm aa}!"'
-          undo: 'kitteh:kit.revoke Sponges {0} {1,number,#}'
+          dispatch: 'kitteh:kit.grant Sponges {0} {3,number,#} "Thank you for your {1} {2,number,0.00} donation on {4,date,yyyy MMM dd hh:mm aa}!"'
+          undo: 'kitteh:kit.revoke Sponges {0} {3,number,#}'
 Supporter:
     description: Additional benefits
     minimum: 1000
@@ -56,5 +56,5 @@ Supporter:
             triggers: [Delay]
             delay: 2592000
             tolerance: 30
-            dispatch: 'donations:undo {3} Supporter "Chat Color Codes"'
+            dispatch: 'donations:undo {5} Supporter "Chat Color Codes"'
 version: @VERSION@

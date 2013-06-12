@@ -8,7 +8,7 @@ import java.util.Comparator;
 public final class Donation {
 
     public static String createKey(final String processor, final String id) {
-        return processor + ":" + id;
+        return processor + "-" + id;
     }
 
 
@@ -25,7 +25,10 @@ public final class Donation {
     /** in-game name of player to apply donation benefits to */
     public final String player;
 
-    /** financial total donated (USD) */
+    /** financial denomination of amount */
+    public final String currency;
+
+    /** financial total donated multiplied by 100 */
     public final long amount;
 
     /** when donation was made in milliSeconds from midnight, January 1, 1970 UTC */
@@ -37,16 +40,17 @@ public final class Donation {
     private final String key;
 
     /** new, unassigned, incoming donation */
-    public Donation(final Processor processor, final String id, final String origin, final String player, final long amount, final long contributed) {
-        this(processor.getId(), id, origin, player, amount, contributed, null);
+    public Donation(final Processor processor, final String id, final String origin, final String player, final String currency, final long amount, final long contributed) {
+        this(processor.getId(), id, origin, player, currency, amount, contributed, null);
     }
 
     /** existing donation with packages already applied */
-    public Donation(final String processor, final String id, final String origin, final String player, final long amount, final long contributed, final Collection<String> packages) {
+    public Donation(final String processor, final String id, final String origin, final String player, final String currency, final long amount, final long contributed, final Collection<String> packages) {
         this.processor = processor;
         this.id = id;
         this.origin = origin;
         this.player = player;
+        this.currency = currency;
         this.amount = amount;
         this.contributed = contributed;
         this.packages = packages;
@@ -78,14 +82,13 @@ public final class Donation {
 
     @Override
     public String toString() {
-        return MessageFormat.format("Donation [processor={0},id={1},origin={2}, playerName={3}, amount={4}, contributed={5}]"
-                , this.processor, this.id, this.origin, this.player, this.amount, this.contributed);
+        return MessageFormat.format("Donation [processor={0}, id={1}, origin={2}, playerName={3}, currency={4}, amount={5,number,#}, contributed={6,date,yyyy MMM dd hh:mm aa}]"
+                , this.processor, this.id, this.origin, this.player, this.currency, this.amount / 100, this.contributed);
     }
 
-    public Donation as(final String player) {
-        return new Donation(this.processor, this.id, this.origin, player, this.amount, this.contributed, this.packages);
+    Donation register(final String player) {
+        return new Donation(this.processor, this.id, this.origin, player, this.currency, this.amount, this.contributed, this.packages);
     }
-
 
 
     public static final NewestContributionFirst NEWEST_CONTRIBUTION_FIRST = new Donation.NewestContributionFirst();

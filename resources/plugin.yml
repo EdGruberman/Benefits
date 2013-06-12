@@ -20,12 +20,12 @@ commands:
     permission: donations.process
     usage: '§f-> §7Usage: §b§l/<command> §3§odonator amount §3[§owhen§3]'
   'donations:undo':
-    aliases: [donations.undo]
+    aliases: [undo, donations.undo]
     description: Revert applied package, benefit, or command for donation
     permission: donations.undo
     usage: '§f-> §7Usage: §b§l/<command> §3§odonation package §3[§obenefit §3[§ocommand§3]]'
   'donations:sandbox':
-    aliases: [donations.sandbox]
+    aliases: [sandbox, donations.sandbox]
     description: Toggle sandbox mode on or off
     permission: donations.sandbox
     usage: '§f-> §7Usage: §b§l/<command> §3[§lon§3|§loff§3]'

@@ -28,7 +28,7 @@ public class PayPal extends Processor {
     public PayPal(final Coordinator coordinator, final ConfigurationSection config) {
         super(coordinator, config);
         this.email = config.getString("email").toLowerCase();
-        this.currency = config.getString("currency").toLowerCase();
+        this.currency = this.coordinator.currency.toLowerCase();
 
         // parse listen binding
         final String ip = config.getString("listen-ip");
@@ -51,6 +51,7 @@ public class PayPal extends Processor {
         this.coordinator.plugin.getLogger().log(Level.CONFIG, "[PayPal] Listening for IPNs from {0,choice,0#any remote|1#{1}} at http://{2}:{3,number,#}/"
                 , new Object[] { ( this.listener.getWhitelist() == null ? 0 : 1 ), this.listener.getWhitelist()
                 , this.listener.getAddress().getAddress().getHostAddress(), this.listener.getAddress().getPort() });
+        this.coordinator.plugin.getLogger().log(Level.CONFIG, "[PayPal] Validating IPNs at {0}", this.listener.getValidator());
     }
 
     @Override
@@ -71,7 +72,7 @@ public class PayPal extends Processor {
             return;
         }
 
-        this.process(ipn.getValue(Variable.TRANSACTION_ID), ipn.getValue(Variable.PAYER_EMAIL), ipn.getValue(Variable.CUSTOM), gross, contributed.getTime());
+        this.process(ipn.getValue(Variable.TRANSACTION_ID), ipn.getValue(Variable.PAYER_EMAIL), ipn.getValue(Variable.CUSTOM), ipn.getValue(Variable.CURRENCY), gross, contributed.getTime());
     }
 
     private void inspect(final InstantPaymentNotification ipn) {

@@ -22,11 +22,13 @@ public final class Coordinator {
     public final Map<String, String> registrations = new HashMap<String, String>();
 
     public final Plugin plugin;
+    public final String currency;
 
     private boolean sandbox = false;
 
-    Coordinator(final Plugin plugin) {
+    Coordinator(final Plugin plugin, final String currency) {
         this.plugin = plugin;
+        this.currency = currency;
     }
 
     public boolean isSandbox() {
@@ -44,8 +46,8 @@ public final class Coordinator {
         this.registrations.clear();
     }
 
-    void putPackage(final Package pkg) {
-        this.packages.put(pkg.name.toLowerCase(), pkg);
+    Package putPackage(final Package pkg) {
+        return this.packages.put(pkg.name.toLowerCase(), pkg);
     }
 
     /** @param name lower case Package name */
@@ -66,7 +68,7 @@ public final class Coordinator {
         ((Main) this.plugin).saveRegistration(origin, player);
 
         for (final Donation donation : this.unassigned(origin)) {
-            final Donation updated = donation.as(player);
+            final Donation updated = donation.register(player);
             this.putDonation(updated);
             this.assign(updated);
         }
@@ -75,7 +77,7 @@ public final class Coordinator {
     }
 
     public void assign(final Donation donation) {
-        this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] } Donation: {1}", new Object[] { this.sandbox?1:0, donation });
+        this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] }Donation: {1}", new Object[] { this.sandbox?1:0, donation });
         if (!this.sandbox) this.donations.put(donation.getKey(), donation);
 
         // do not attempt assignment if player not identified yet
@@ -90,7 +92,7 @@ public final class Coordinator {
             for (final Benefit benefit : pkg.benefits.values()) {
                 for (final Command command : benefit.commands.values()) {
                     if (!this.sandbox) command.add(donation);
-                    this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] }   {0,choice,0#Assigned|1#Applicable}: {1}"
+                    this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] }   {0,choice,0#Assigned|1#Applicable}: {2}"
                             , new Object[] { this.sandbox?1:0, pkg, command });
                 }
             }
@@ -107,9 +109,10 @@ public final class Coordinator {
         final String lower = origin.toLowerCase();
 
         final List<Donation> result = new ArrayList<Donation>();
-        for (final Donation donation : this.donations.values())
+        for (final Donation donation : this.donations.values()) {
             if (donation.player == null && donation.origin.toLowerCase().equals(lower) && donation.packages == null)
                 result.add(donation);
+        }
 
         Collections.sort(result, Collections.reverseOrder(Donation.NEWEST_CONTRIBUTION_FIRST));
         return result;

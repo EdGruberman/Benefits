@@ -15,7 +15,7 @@ public class SlashCommand extends Processor {
     }
 
     public Donation process(final String origin, final String player, final long amount, final long contributed) {
-        return this.process(UUID.randomUUID().toString(), origin, player, amount, contributed);
+        return this.process(UUID.randomUUID().toString(), origin, player, this.coordinator.currency, amount, contributed);
     }
 
 }

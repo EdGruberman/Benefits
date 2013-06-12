@@ -27,7 +27,7 @@ public final class Undo extends Executor {
     @Override
     protected boolean execute(final CommandSender sender, final org.bukkit.command.Command command, final String label, final List<String> args) {
         if (args.size() < 1) {
-            Main.courier.send(sender, "requires-argument", "donation", false);
+            Main.courier.send(sender, "requires-argument", "donation", 0);
             return false;
         }
 
@@ -38,7 +38,7 @@ public final class Undo extends Executor {
         }
 
         if (args.size() < 2) {
-            Main.courier.send(sender, "requires-argument", "package", false);
+            Main.courier.send(sender, "requires-argument", "package", 0);
             return false;
         }
 
@@ -87,7 +87,7 @@ public final class Undo extends Executor {
 
         this.coordinator.savePending();
         Main.courier.send(sender, "undo.success"
-                , donation.player, donation.amount / 100D, new Date(donation.contributed)
+                , donation.player, donation.currency, donation.amount / 100D, new Date(donation.contributed)
                 , new JoinList<String>(Main.courier.getSection("undo.commands"), removed));
 
         return true;

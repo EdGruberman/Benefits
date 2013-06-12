@@ -22,7 +22,7 @@ public final class Register implements CommandExecutor {
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
         if (args.length < 1) {
-            Main.courier.send(sender, "requires-argument", "origin", false);
+            Main.courier.send(sender, "requires-argument", "origin", 0);
             return false;
         }
 
@@ -31,7 +31,7 @@ public final class Register implements CommandExecutor {
 
         final List<Donation> unassigned = this.coordinator.unassigned(origin);
         Main.courier.send(sender, "register.unassigned.header", origin);
-        for (final Donation donation : unassigned) Main.courier.send(sender, "register.unassigned.item", donation.processor, donation.id, donation.amount / 100D, donation.contributed);
+        for (final Donation donation : unassigned) Main.courier.send(sender, "register.unassigned.item", donation.processor, donation.id, donation.currency, donation.amount / 100D, donation.contributed);
         Main.courier.send(sender, "register.unassigned.footer", unassigned.size());
         if (player == null) return true;
 

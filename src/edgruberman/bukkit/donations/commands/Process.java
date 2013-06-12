@@ -27,12 +27,12 @@ public final class Process implements CommandExecutor {
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
         if (args.length < 1) {
-            Main.courier.send(sender, "requires-argument", "donator", false);
+            Main.courier.send(sender, "requires-argument", "donator", 0);
             return false;
         }
 
         if (args.length < 2) {
-            Main.courier.send(sender, "requires-argument", "amount", false);
+            Main.courier.send(sender, "requires-argument", "amount", 0);
             return false;
         }
 
@@ -52,7 +52,7 @@ public final class Process implements CommandExecutor {
 
         final Donation donation = this.processor.process(sender.getName(), donator, amount, when.getTime());
         final List<String> packages = new JoinList<String>(Main.courier.getSection("process.packages"), donation.packages);
-        Main.courier.send(sender, "process.success", donator, amount / 100D, packages);
+        Main.courier.send(sender, "process.success", donator, donation.currency, amount / 100D, packages);
         return true;
     }
 

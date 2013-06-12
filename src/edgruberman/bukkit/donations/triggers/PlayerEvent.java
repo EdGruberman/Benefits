@@ -57,22 +57,25 @@ public abstract class PlayerEvent extends Trigger implements Listener {
     }
 
     @Override
-    public void remove(final Donation donation) {
+    public boolean remove(final Donation donation) {
         final String name = donation.player.toLowerCase();
         final List<Donation> donations = this.pending.get(name);
-        if (donations == null) return;
+        if (donations == null) return false;
 
+        boolean removed = false;
         final Iterator<Donation> itDonations = donations.iterator();
         while (itDonations.hasNext()) {
             final Donation pending = itDonations.next();
             if (pending.equals(donation)) {
                 itDonations.remove();
+                removed = true;
                 break;
             }
         }
 
         if (donations.size() == 0) this.pending.remove(name);
         if (this.pending.size() == 0) this.clear();
+        return removed;
     }
 
     protected void dispatch(final Player player) {

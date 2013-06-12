@@ -59,8 +59,9 @@ public class Delay extends Trigger implements Runnable {
     }
 
     @Override
-    public void remove(final Donation donation) {
-        this.pending.remove(donation);
+    public boolean remove(final Donation donation) {
+        final boolean removed = this.pending.remove(donation);
+        return removed;
     }
 
     @Override

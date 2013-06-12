@@ -35,7 +35,7 @@ public final class History implements CommandExecutor {
         final Integer page =  History.parsePage(args);
 
         if (args.length < 2 && !(sender instanceof Player)) {
-            Main.courier.send(sender, "requires-argument", "page player", false);
+            Main.courier.send(sender, "requires-argument", "page player", 0);
             return false;
         }
 
@@ -53,8 +53,7 @@ public final class History implements CommandExecutor {
         for (final Donation donation : history.subList(first, last)) {
             final List<String> packages = new JoinList<String>(Main.courier.getSection("history.packages"), donation.packages);
             final long days = TimeUnit.MILLISECONDS.toDays(now - donation.contributed);
-            System.out.println(donation.amount);
-            Main.courier.send(sender, "history.donation", new Date(donation.contributed), days, donation.amount / 100D, packages);
+            Main.courier.send(sender, "history.donation", new Date(donation.contributed), days, donation.currency, donation.amount / 100D, packages);
         }
 
         final long oldest = TimeUnit.MILLISECONDS.toDays(now - history.get(0).contributed);

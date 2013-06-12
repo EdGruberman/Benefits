@@ -1,30 +1,30 @@
 format-code: '§'
 history:
   none: '§f-> §7No donation history found for §f{1}' # 1 = <Player>
-  donation: '§f-> §7{1,date,yyyy MMM dd hh:mm aa} §8(§7{2,choice,0#<1|1#{2}}d§8)§7 = §a${3,number,#.##}§7 §8[§7{4}§8]' # 1 = Contributed, 2 = Days Since Contributed, 3 = Amount, 4 = Packages
+  donation: '§f-> §7{1,date,yyyy MMM dd hh:mm aa} §8(§7{2,choice,0#<1|1#{2}}d§8)§7 = §a{3} {4,number,0.00}§7 §8[§7{5}§8]' # 1 = contributed, 2 = days since contributed, 3 = currency, 4 = amount, 5 = packages
   packages:
     item: '{0}' # 0 = Package
     delimiter: '§8,§7 '
   summary: # 1 = Donator, 2 = Oldest (Days), 3 = Newest (Days), 4 = Current Page, 5 = Page Count, 6 = Donation Count, 7 = Donation Sum
-    - '§f-> §f{1} §7donated §a${7,number,#.##}§7 over {6} donations'
+    - '§f-> §f{1} §7donated §a{7,number,0.00}§7 over {6} donations'
     - '§f-> §8(§7Last: {3,choice,0#<1|1#{3}}d§8,§7 First: {2,choice,0#<1|1#{2}}d§8)§7  Page §f{4}§7 of {5}'
 benefits:
   none: '§f-> §7No benefits assigned to package'
-  package: '§f-> §7§l{1}§8:§7 §a${3,number,#.##}+§7 §8=§7 {2}{4}' # 1 = Package, 2 = Description, 3 = Minimum, 4 = Limit
+  package: '§f-> §7§l{1}§8:§7 §a{3,number,0.00}+§7 §8=§7 {2}{4}' # 1 = Package, 2 = Description, 3 = Minimum, 4 = Limit
   limit: ' §8(§e{0}d limit§8)' # 1 = Limit (Days)
   instruction: '§7To list specifics: §b§l/benefits §3§opackage'
   benefit: '§f-> §7§l{1} §8>§7 §l{2}§8:§7 {3}' # 1 = Package, 2 = Benefit, 3 = Description
 process:
-  success: # 1 = Donator, 2 = Amount, 3 = Packages
-    - '§f-> §2Processed §7donation from §f{1} for §a${2,number,#.##}'
-    - '§f-> §7Packages assigned§8:§7 {3}'
+  success: # 1 = donator, 2 = currency, 3 = amount, 3 = packages
+    - '§f-> §2Processed §7donation from §f{1}§7 for §a{2} {3,number,0.00}'
+    - '§f-> §7Packages assigned§8:§7 {4}'
   packages:
     item: '{0}' # 0 = Package
     delimiter: '§8,§7 '
 undo:
-  success: # 1 = Donator, 2 = Amount, 3 = Contributed, 4 = Commands
-    - '§f-> §2Reverted §7benefits from §f{1} §7assigned for §a${2,number,#.##}§7 on {3,date,yyyy MMM dd hh:mm aa}'
-    - '§f-> §7Commands undone§8:§7 {4}'
+  success: # 1 = donator, 2 = currency, 3 = amount, 4 = contributed, 5 = commands
+    - '§f-> §2Reverted §7benefits from §f{1} §7assigned for §a{2} {3,number,0.00}§7 on {4,date,yyyy MMM dd hh:mm aa}'
+    - '§f-> §7Commands undone§8:§7 {5}'
   commands:
     item: '{0}' # 0 = Command
     delimiter: '§8,§7 '
@@ -32,7 +32,7 @@ register:
   success: '§f-> §2Registered §f{1} §7with §f{2} §8(§7Previously §8=§7 {3}§8)' # 0 = generated, 1 = origin, 2 = player, 3 = previous
   unassigned:
     header: '§f-> §2Unassigned§7 donations with origin of §f{1}§8:' # 0 = generated, 1 = origin
-    item: '§f-> {1} {2}§8: §7{4,date,yyyy MMM dd hh:mm aa} §8= §a${3,number,#.##}' # 0 = generated, 1 = processor, 2 = id, 3 = amount, 4 = contributed
+    item: '§f-> {1} {2}§8: §7{5,date,yyyy MMM dd hh:mm aa} §8= §a{3} {4,number,0.00}' # 0 = generated, 1 = processor, 2 = id, 3 = currency, 4 = amount, 5 = contributed
     footer: '§f-> §7Total§8: {1} unassigned donation{1,choice,0#s|1#|2#s}' # 0 = generated, 1 = unassigned count
 sandbox: '§f-> §7Donations are now {1,choice,0#assigned as §alive|1#only logged in §6sandbox mode}' # 0 = Generated, 1 = Sandbox(0|1)
 reload: '§f-> §2Reloaded §7{1} plugin' # 0 = Generated, 1 = Plugin Name

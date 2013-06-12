@@ -3,10 +3,10 @@ package edgruberman.bukkit.donations;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 
 import edgruberman.bukkit.donations.commands.Benefits;
 import edgruberman.bukkit.donations.commands.History;
@@ -22,6 +22,7 @@ import edgruberman.bukkit.donations.util.CustomPlugin;
 public final class Main extends CustomPlugin {
 
     private static final String PACKAGES_FILE = "packages.yml";
+    private static final String LANGUAGE_FILE = "language.yml";
 
     public static ConfigurationCourier courier;
 
@@ -33,33 +34,37 @@ public final class Main extends CustomPlugin {
 
     @Override
     public void onLoad() {
-        this.putConfigMinimum("0.0.0a106");
-        this.putConfigMinimum(Main.PACKAGES_FILE, "0.0.0a84");
+        this.putConfigMinimum("0.0.0a109");
+        this.putConfigMinimum(Main.PACKAGES_FILE, "0.0.0a126");
+        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0a121");
     }
 
     @Override
     public void onEnable() {
         this.reloadConfig();
-        Main.courier = ConfigurationCourier.create(this).setBase(this.loadConfig("language.yml")).setFormatCode("format-code").build();
+        Main.courier = ConfigurationCourier.create(this).setBase(this.loadConfig(Main.LANGUAGE_FILE)).setFormatCode("format-code").build();
 
 
         // coordinator
-        this.coordinator = new Coordinator(this);
+        this.coordinator = new Coordinator(this, this.getConfig().getString("currency"));
         this.coordinator.setSandbox(this.getConfig().getBoolean("sandbox"));
+        this.getLogger().log(Level.CONFIG, "Currency: {0}; Sandbox: {1}", new Object[] { this.coordinator.currency, this.coordinator.isSandbox() });
 
         this.loadPackages(this.loadConfig(Main.PACKAGES_FILE));
 
         this.donations = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "donations.yml"), 5000);
+        try { this.donations.load(); } catch (final Exception e) { throw new IllegalStateException("Unable to load donations.yml file; {0}", e); }
         this.loadDonations(this.donations);
-        this.getLogger().log(Level.CONFIG, "Loaded {0} donations", this.coordinator.donations.size());
+        this.getLogger().log(Level.CONFIG, "Loaded {0} donation{0,choice,0#s|1#|2#s}", this.coordinator.donations.size());
 
         this.pending = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "pending.yml"), 5000);
+        try { this.pending.load(); } catch (final Exception e) { throw new IllegalStateException("Unable to load pending.yml file; {0}", e); }
         this.loadPending(this.pending);
 
         this.registrations = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "registrations.yml"), 5000);
-        this.loadRegistrations(this.registrations);
-        this.getLogger().log(Level.CONFIG, "Loaded {0} registrations", this.coordinator.registrations.size());
-
+        try { this.registrations.load(); } catch (final Exception e) { throw new IllegalStateException("Unable to load registrations.yml file; {0}", e); }
+        this.loadRegistrations(this.registrations.getRoot());
+        this.getLogger().log(Level.CONFIG, "Loaded {0} registration{0,choice,0#s|1#|2#s}", this.coordinator.registrations.size());
 
         // processors
         final ConfigurationSection processorsConfig = this.getConfig().getConfigurationSection("processors");
@@ -72,7 +77,7 @@ public final class Main extends CustomPlugin {
             try {
                 processor = Processor.create(processorClass, this.coordinator, config);
             } catch (final Exception e) {
-                this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}", new Object[] { processorClass, e });
+                this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}; {2}", new Object[] { processorClass, e, e.getCause() });
                 this.getLogger().log(Level.FINE, "", e);
                 continue;
             }
@@ -104,25 +109,37 @@ public final class Main extends CustomPlugin {
 
     // -- repository methods --
 
-    // TODO check for duplicates while loading and send warning to log
     private void loadPackages(final ConfigurationSection packages) {
         for (final String name : packages.getKeys(false)) {
             if (name.equals("version")) continue;
             final Package pkg = new Package(this.coordinator, packages.getConfigurationSection(name));
-            this.coordinator.putPackage(pkg);
+            final Package duplicate = this.coordinator.putPackage(pkg);
+            if (duplicate != null) this.getLogger().log(Level.WARNING, "Unable to load duplicate package from packages.yml; {0}", duplicate);
         }
     }
 
-    // TODO check for duplicates while loading and send warning to log
     private void loadDonations(final ConfigurationSection donations) {
+        final String lower = this.coordinator.currency.toLowerCase();
+        int mismatched = 0;
+
         for (final String key : donations.getKeys(false)) {
             final ConfigurationSection entry = donations.getConfigurationSection(key);
 
-            final Donation donation = new Donation(entry.getString("processor"), entry.getString("id"), entry.getString("origin")
-                    , entry.getString("player") , entry.getLong("amount"), entry.getLong("contributed"), entry.getStringList("packages"));
+            final String currency = entry.getString("currency");
+            if (!lower.equals(currency.toLowerCase())) {
+                mismatched++;
+                continue;
+            }
 
-            this.coordinator.putDonation(donation);
+            final Donation donation = new Donation(entry.getString("processor"), entry.getString("id"), entry.getString("origin")
+                    , entry.getString("player"), currency, entry.getLong("amount"), entry.getLong("contributed"), ( entry.isSet("packages") ? entry.getStringList("packages") : null ));
+
+            final Donation duplicate = this.coordinator.putDonation(donation);
+            if (duplicate != null) this.getLogger().log(Level.WARNING, "Unable to load duplicate donation from donations.yml; {0}", duplicate);
         }
+
+        if (mismatched > 0) this.getLogger().log(Level.WARNING, "Unable to load {0} currency mismatched donations from donations.yml; Required currency: {1}"
+                , new Object[] { mismatched, this.coordinator.currency });
     }
 
     void saveDonation(final Donation donation) {
@@ -131,6 +148,7 @@ public final class Main extends CustomPlugin {
         entry.set("id", donation.id);
         entry.set("origin", donation.origin);
         entry.set("player", donation.player);
+        entry.set("currency", donation.currency);
         entry.set("amount", donation.amount);
         entry.set("contributed", donation.contributed);
         entry.set("packages", donation.packages);
@@ -179,11 +197,7 @@ public final class Main extends CustomPlugin {
     }
 
     void savePending() {
-        try {
-            this.pending.loadFromString("");
-        } catch (final InvalidConfigurationException e) {
-            throw new RuntimeException(e);
-        }
+        this.pending.clear();
 
         for (final Package pkg : this.coordinator.packages.values()) {
             for (final Benefit benefit : pkg.benefits.values()) {
@@ -201,16 +215,16 @@ public final class Main extends CustomPlugin {
     }
 
     private void loadRegistrations(final ConfigurationSection registrations) {
-        final ConfigurationSection entries = registrations.getConfigurationSection("registrations");
-        if (entries == null) return;
-
-        for (final String origin : entries.getKeys(false)) {
-            this.coordinator.registrations.put(origin.toLowerCase(), entries.getString(origin));
+        for (final String path : registrations.getKeys(false)) {
+            final ConfigurationSection entry = registrations.getConfigurationSection(path);
+            this.coordinator.registrations.put(entry.getString("origin").toLowerCase(), entry.getString("player"));
         }
     }
 
     void saveRegistration(final String origin, final String player) {
-        this.registrations.set("registrations." + origin, player);
+        final ConfigurationSection entry = this.registrations.getRoot().createSection(UUID.randomUUID().toString());
+        entry.set("origin", origin);
+        entry.set("player", player);
         this.registrations.queueSave();
     }
 
