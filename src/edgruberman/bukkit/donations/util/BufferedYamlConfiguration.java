@@ -1,23 +1,32 @@
 package edgruberman.bukkit.donations.util;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
+import com.google.common.io.Files;
+
 /**
  * queues save requests to prevent occurring more than a maximum rate
  *
  * @author EdGruberman (ed@rjump.com)
- * @version 2.3.0
+ * @version 3.0.0
  */
 public class BufferedYamlConfiguration extends YamlConfiguration implements Runnable {
 
+    protected static final String NEWLINE_PLATFORM = System.getProperty("line.separator");
+    protected static final Pattern NEWLINE_ANY = Pattern.compile("\\r?\\n");
     protected static final int TICKS_PER_SECOND = 20;
 
     protected final Plugin owner;
@@ -25,6 +34,7 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
     protected long rate;
     protected long lastSaveAttempt = -1;
     protected int taskSave = -1;
+    protected Object lock = new Object();
 
     /** @param rate minimum time between saves (milliseconds) */
     public BufferedYamlConfiguration(final Plugin owner, final File file, final long rate) {
@@ -56,6 +66,10 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
         return this.lastSaveAttempt;
     }
 
+    public void clear() {
+        this.map.clear();
+    }
+
     public BufferedYamlConfiguration load() throws IOException, InvalidConfigurationException {
         try {
             super.load(this.file);
@@ -81,26 +95,21 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
         super.save(file);
     }
 
-    @Override
-    public void run() {
-        this.save();
-        this.taskSave = -1;
-    }
-
     /** force immediate save */
-    public void save() {
+    public boolean save() {
         try {
             super.save(this.file);
 
         } catch (final IOException e) {
             this.owner.getLogger().log(Level.SEVERE, "Unable to save configuration file: {0}; {1}", new Object[] { this.file, e });
-            return;
+            return false;
 
         } finally {
             this.lastSaveAttempt = System.currentTimeMillis();
         }
 
         this.owner.getLogger().log(Level.FINEST, "Saved configuration file: {0}", this.file);
+        return true;
     }
 
     public void queueSave() {
@@ -124,7 +133,16 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
             return;
         }
 
-        this.save();
+        this.run();
+    }
+
+    @Override
+    public void run() {
+        final String data = this.saveToString();
+        final Logger logger = new SynchronousPluginLogger(this.owner);
+        final Runnable writer = new AsynchronousWriter(this.file, data, logger, this.lock);
+        Bukkit.getScheduler().runTaskAsynchronously(this.owner, writer);
+        this.taskSave = -1;
     }
 
     public boolean isQueued() {
@@ -135,8 +153,42 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
         Bukkit.getScheduler().cancelTask(this.taskSave);
     }
 
-    public void clear() {
-        this.map.clear();
+
+
+    protected class AsynchronousWriter implements Runnable {
+
+        protected final File file;
+        protected final String data;
+        protected final Logger logger;
+        protected final Object lock;
+
+        public AsynchronousWriter(final File file, final String data, final Logger logger, final Object lock) {
+            this.file = file;
+            this.data = data;
+            this.logger = logger;
+            this.lock = lock;
+        }
+
+        @Override
+        public synchronized void run() {
+            try {
+                synchronized (this.lock) {
+                    if (!this.file.getParentFile().exists()) Files.createParentDirs(this.file);
+                    final Writer writer = new BufferedWriter(new FileWriter(this.file));
+                    try {
+                        writer.write(BufferedYamlConfiguration.NEWLINE_ANY.matcher(this.data).replaceAll(BufferedYamlConfiguration.NEWLINE_PLATFORM));
+                    } finally {
+                        writer.close();
+                    }
+                }
+            } catch (final IOException e) {
+                this.logger.log(Level.SEVERE, "Unable to save configuration file: {0}; {1}", new Object[] { this.file, e });
+            } finally {
+                BufferedYamlConfiguration.this.lastSaveAttempt = System.currentTimeMillis();
+            }
+            this.logger.log(Level.FINEST, "Saved configuration file: {0}", this.file);
+        }
+
     }
 
 }
