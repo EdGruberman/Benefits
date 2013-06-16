@@ -21,6 +21,7 @@ public final class Benefit {
         this.limit = definition.getInt("limit");
 
         final ConfigurationSection commands = definition.getConfigurationSection("commands");
+        if (commands == null) return;
         for (final String commandName : commands.getKeys(false)) {
             final Command command = new Command(this, commands.getConfigurationSection(commandName));
             this.commands.put(command.name.toLowerCase(), command);

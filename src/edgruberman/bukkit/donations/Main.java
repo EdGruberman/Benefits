@@ -35,8 +35,7 @@ public final class Main extends CustomPlugin {
     @Override
     public void onLoad() {
         this.putConfigMinimum("0.0.0a109");
-        this.putConfigMinimum(Main.PACKAGES_FILE, "0.0.0a126");
-        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0a121");
+        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0a141");
     }
 
     @Override
@@ -66,7 +65,8 @@ public final class Main extends CustomPlugin {
         this.loadRegistrations(this.registrations.getRoot());
         this.getLogger().log(Level.CONFIG, "Loaded {0} registration{0,choice,0#s|1#|2#s}", this.coordinator.registrations.size());
 
-        // processors
+
+        // payment processors
         final ConfigurationSection processorsConfig = this.getConfig().getConfigurationSection("processors");
         for (final String key : processorsConfig.getKeys(false)) {
             final ConfigurationSection config = processorsConfig.getConfigurationSection(key);
@@ -77,7 +77,7 @@ public final class Main extends CustomPlugin {
             try {
                 processor = Processor.create(processorClass, this.coordinator, config);
             } catch (final Exception e) {
-                this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}; {2}", new Object[] { processorClass, e, e.getCause() });
+                this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}; {2}; {3}", new Object[] { processorClass, e, e.getCause(), ( e.getCause() != null ? e.getCause().getCause() : null ) });
                 this.getLogger().log(Level.FINE, "", e);
                 continue;
             }

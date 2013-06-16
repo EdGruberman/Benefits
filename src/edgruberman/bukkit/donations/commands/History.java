@@ -58,8 +58,8 @@ public final class History implements CommandExecutor {
 
         final long oldest = TimeUnit.MILLISECONDS.toDays(now - history.get(0).contributed);
         final long newest = TimeUnit.MILLISECONDS.toDays(now - history.get(history.size() - 1).contributed);
-        double sum = 0; for (final Donation donation : history) sum += donation.amount;
-        Main.courier.send(sender, "history.summary", target, oldest, newest, page, total, history.size(), sum);
+        long sum = 0; for (final Donation donation : history) sum += donation.amount;
+        Main.courier.send(sender, "history.summary", target, oldest, newest, page, total, history.size(), this.coordinator.currency, sum / 100D);
         return true;
     }
 

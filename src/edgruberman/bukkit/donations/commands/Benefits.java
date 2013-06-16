@@ -31,8 +31,7 @@ public final class Benefits extends Executor {
             // Spawn City: $10.00+ USD - Spawn anything, any time
             // To list benefits: /benefits "<Package>" (Example: /benefits Donor)
             for (final Package pkg : this.coordinator.packages.values()) {
-                final String limit = (pkg.limit != null ? Main.courier.format("benefits.limit", pkg.limit): "");
-                Main.courier.send(sender, "benefits.package", pkg.name, pkg.description, pkg.minimum, limit);
+                Main.courier.send(sender, "benefits.package", pkg.name, pkg.description, pkg.minimum / 100D, pkg.limit, ( pkg.limit != null ? 1 : 0 ), this.coordinator.currency);
             }
             Main.courier.send(sender, "benefits.instruction");
 

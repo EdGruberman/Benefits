@@ -18,7 +18,7 @@ public final class Package {
     public String description;
 
     /** amount at which package is applicable for a donation */
-    public Double minimum;
+    public long minimum;
 
     /** days before package can be applied for a new donation */
     public Integer limit;
@@ -30,7 +30,7 @@ public final class Package {
         this.coordinator = coordinator;
         this.name = definition.getName();
         this.description = definition.getString("description");
-        this.minimum = definition.getDouble("minimum");
+        this.minimum = definition.getLong("minimum");
         this.limit = definition.getInt("limit");
 
         final ConfigurationSection benefits = definition.getConfigurationSection("benefits");
@@ -79,7 +79,7 @@ public final class Package {
 
         @Override
         public int compare(final Package x, final Package y) {
-            return x.minimum.compareTo(y.minimum);
+            return Long.valueOf(x.minimum).compareTo(Long.valueOf(y.minimum));
         }
 
     }
