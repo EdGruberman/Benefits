@@ -92,6 +92,7 @@ public abstract class PlayerEvent extends Trigger implements Listener {
 
         if (donations.size() == 0) this.pending.remove(name);
         if (this.pending.size() == 0) this.clear();
+        this.command.getCoordinator().savePending();
     }
 
 }

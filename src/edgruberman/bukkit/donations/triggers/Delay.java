@@ -14,6 +14,8 @@ import edgruberman.bukkit.donations.Trigger;
 /** Applied after a specified delay interval from when donation was contributed */
 public class Delay extends Trigger implements Runnable {
 
+    private static final long DEFAULT_DELAY = -1; // no delay
+    private static final long DEFAULT_TOLERANCE = 30; // seconds
     private static final long TICKS_PER_SECOND = 20;
 
     private final long delay;
@@ -23,8 +25,8 @@ public class Delay extends Trigger implements Runnable {
 
     public Delay(final Command command, final ConfigurationSection definition) {
         super(command, definition);
-        this.delay = definition.getLong("delay", -1) * 1000;
-        this.tolerance = definition.getInt("tolerance", 30) * Delay.TICKS_PER_SECOND;
+        this.delay = definition.getLong("delay", Delay.DEFAULT_DELAY) * 1000;
+        this.tolerance = definition.getLong("tolerance", Delay.DEFAULT_TOLERANCE) * Delay.TICKS_PER_SECOND;
     }
 
     @Override

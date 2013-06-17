@@ -54,7 +54,6 @@ public final class Command {
     public boolean dispatch(final Donation donation) {
         if (!this.remove(donation)) return false;
         this.execute(donation, this.dispatch);
-        this.getCoordinator().savePending();
         return true;
     }
 
