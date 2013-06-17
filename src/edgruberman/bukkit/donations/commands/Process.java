@@ -37,27 +37,27 @@ public final class Process implements CommandExecutor {
         }
 
         final String donator = args[0];
-        Long amount = Process.parseLong(args[1]);
+        final Double amount = Process.parseDouble(args[1]);
         if (amount == null) {
             Main.courier.send(sender, "unknown-argument", "amount", false, args[1]);
             return false;
         }
-        amount = amount * 100;
+        final long converted = (long) (amount * 100);
 
         final Date when = (args.length >= 3 ? Process.parseDate(args[2]) : new Date());
         if (when == null) {
-            Main.courier.send(sender, "unknown-argument", "amount", false, args[2]);
+            Main.courier.send(sender, "unknown-argument", "when", false, args[2]);
             return false;
         }
 
-        final Donation donation = this.processor.process(sender.getName(), donator, amount, when.getTime());
+        final Donation donation = this.processor.process(sender.getName(), donator, converted, when.getTime());
         final List<String> packages = new JoinList<String>(Main.courier.getSection("process.packages"), donation.packages);
-        Main.courier.send(sender, "process.success", donator, donation.currency, amount / 100D, packages);
+        Main.courier.send(sender, "process.success", donator, donation.currency, converted / 100D, packages);
         return true;
     }
 
-    private static Long parseLong(final String s) {
-        try { return Long.parseLong(s);
+    private static Double parseDouble(final String s) {
+        try { return Double.parseDouble(s);
         } catch(final Exception e) { return null; }
     }
 
