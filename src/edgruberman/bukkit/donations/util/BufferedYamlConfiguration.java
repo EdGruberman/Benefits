@@ -117,19 +117,18 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
 
         if (elapsed < this.rate) {
             final long delay = this.rate - elapsed;
-
             if (this.isQueued()) {
                 this.owner.getLogger().log(Level.FINEST
-                        , "Save request already queued to run in {0} seconds for file: {1} (Last attempted {2} seconds ago)"
-                        , new Object[] { delay / 1000, this.getFile(), elapsed / 1000 });
+                        , "Save request already queued to run in {0,number,#.0} seconds for file: {1} (Last attempted {2,number,#.0} seconds ago)"
+                        , new Object[] { delay / 1000D, this.getFile(), elapsed / 1000D });
                 return;
             }
 
             // schedule task to flush cache to file system
-            this.taskSave = Bukkit.getScheduler().scheduleSyncDelayedTask(this.owner, this, delay / 1000 * BufferedYamlConfiguration.TICKS_PER_SECOND);
+            this.taskSave = Bukkit.getScheduler().scheduleSyncDelayedTask(this.owner, this, delay * BufferedYamlConfiguration.TICKS_PER_SECOND / 1000);
             this.owner.getLogger().log(Level.FINEST
-                    , "Queued save request to run in {0} seconds for configuration file: {1} (Last attempted {2} seconds ago)"
-                    , new Object[] { delay / 1000, this.getFile(), elapsed / 1000 });
+                    , "Queued save request to run in {0,number,#.0} seconds for configuration file: {1} (Last attempted {2,number,#.0} seconds ago)"
+                    , new Object[] { delay / 1000D, this.getFile(), elapsed / 1000D });
             return;
         }
 
@@ -138,6 +137,7 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
 
     @Override
     public void run() {
+        this.lastSaveAttempt = System.currentTimeMillis();
         final String data = this.saveToString();
         final Logger logger = new SynchronousPluginLogger(this.owner);
         final Runnable writer = new AsynchronousWriter(this.file, data, logger, this.lock);
@@ -155,7 +155,7 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
 
 
 
-    protected class AsynchronousWriter implements Runnable {
+    protected static class AsynchronousWriter implements Runnable {
 
         protected final File file;
         protected final String data;
@@ -183,8 +183,6 @@ public class BufferedYamlConfiguration extends YamlConfiguration implements Runn
                 }
             } catch (final IOException e) {
                 this.logger.log(Level.SEVERE, "Unable to save configuration file: {0}; {1}", new Object[] { this.file, e });
-            } finally {
-                BufferedYamlConfiguration.this.lastSaveAttempt = System.currentTimeMillis();
             }
             this.logger.log(Level.FINEST, "Saved configuration file: {0}", this.file);
         }
