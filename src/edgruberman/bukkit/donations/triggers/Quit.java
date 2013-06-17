@@ -14,7 +14,7 @@ public class Quit extends PlayerEvent {
 
     @EventHandler
     public void onEvent(final PlayerQuitEvent quit) {
-        this.dispatch(quit.getPlayer());
+        this.apply(quit.getPlayer());
     }
 
 }

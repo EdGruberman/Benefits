@@ -60,7 +60,6 @@ public final class Command {
     public boolean undo(final Donation donation) {
         if (!this.remove(donation)) return false;
         this.execute(donation, this.undo);
-        this.getCoordinator().savePending();
         return true;
     }
 
@@ -77,6 +76,7 @@ public final class Command {
             this.getCoordinator().plugin.getLogger().finest("Executing command: " + command);
             Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
         }
+        this.getCoordinator().savePending();
     }
 
     private boolean remove(final Donation donation) {

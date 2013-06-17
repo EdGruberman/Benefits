@@ -15,7 +15,7 @@ public class Join extends PlayerEvent {
 
     @EventHandler
     public void onEvent(final PlayerJoinEvent join) {
-        this.dispatch(join.getPlayer());
+        this.apply(join.getPlayer());
     }
 
 }

@@ -14,7 +14,7 @@ public final class Death extends PlayerEvent {
 
     @EventHandler
     public void onEvent(final PlayerDeathEvent death) {
-        this.dispatch(death.getEntity());
+        this.apply(death.getEntity());
     }
 
 }

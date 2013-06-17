@@ -78,21 +78,13 @@ public abstract class PlayerEvent extends Trigger implements Listener {
         return removed;
     }
 
-    protected void dispatch(final Player player) {
+    protected void apply(final Player player) {
         final String name = player.getName().toLowerCase();
         final List<Donation> donations = this.pending.get(name);
         if (donations == null) return;
 
-        final Iterator<Donation> itDonations = donations.iterator();
-        while (itDonations.hasNext()) {
-            final Donation donation = itDonations.next();
-            this.command.dispatch(donation);
-            itDonations.remove();
-        }
-
-        if (donations.size() == 0) this.pending.remove(name);
-        if (this.pending.size() == 0) this.clear();
-        this.command.getCoordinator().savePending();
+        final List<Donation> copy = new ArrayList<Donation>(donations);
+        for (final Donation donation : copy) this.command.dispatch(donation);
     }
 
 }

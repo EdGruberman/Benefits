@@ -14,7 +14,7 @@ public class Respawn extends PlayerEvent {
 
     @EventHandler
     public void onEvent(final PlayerRespawnEvent respawn) {
-        this.dispatch(respawn.getPlayer());
+        this.apply(respawn.getPlayer());
     }
 
 }
