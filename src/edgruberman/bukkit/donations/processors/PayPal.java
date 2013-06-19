@@ -5,7 +5,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,6 +22,8 @@ import edgruberman.bukkit.donations.processors.paypal.PaymentStatus;
 import edgruberman.bukkit.donations.processors.paypal.TransactionType;
 
 public class PayPal extends Processor {
+
+    private static final List<TransactionType> SUPPORTED_TRANSACTIONS = Arrays.asList(TransactionType.WEB_ACCEPT, TransactionType.SUBSCRIPTION_PAYMENT, TransactionType.SEND_MONEY);
 
     private final String email;
     private final String currency;
@@ -77,7 +81,7 @@ public class PayPal extends Processor {
 
     private void inspect(final InstantPaymentNotification ipn) {
         final TransactionType type = ipn.parseTransactionType();
-        if (TransactionType.WEB_ACCEPT != type && TransactionType.SUBSCRIPTION_PAYMENT != type)
+        if (!PayPal.SUPPORTED_TRANSACTIONS.contains(type))
             throw new IllegalStateException(MessageFormat.format("Unsupported transaction ({0})", ipn.getValue(Variable.TRANSACTION_TYPE)));
 
         final PaymentStatus status = ipn.parsePaymentStatus();
