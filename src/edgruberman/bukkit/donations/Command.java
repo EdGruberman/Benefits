@@ -6,33 +6,47 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-public final class Command {
+import edgruberman.bukkit.donations.triggers.Instant;
+import edgruberman.bukkit.donations.util.JoinList;
+
+public class Command {
+
+    private static final List<String> DEFAULT_TRIGGER = Arrays.asList(Instant.class.getSimpleName());
 
     public final Benefit benefit;
     public final String name;
-    public final Collection<String> dispatch = new ArrayList<String>();
-    public final Collection<String> undo = new ArrayList<String>();
-    public final Collection<Trigger> triggers = new HashSet<Trigger>();
+    public final Collection<String> dispatch;
+    public final Collection<String> undo;
+    public final Collection<Trigger> triggers;
 
     Command(final Benefit benefit, final ConfigurationSection definition) {
-        this.benefit = benefit;
-        this.name = definition.getName();
+        this(benefit, definition.getName(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<Trigger>());
         this.dispatch.addAll(Command.getStringList(definition, "dispatch"));
         this.undo.addAll(Command.getStringList(definition, "undo"));
+        this.parseTriggers(definition, Command.DEFAULT_TRIGGER);
+    }
 
-        for (final String triggerClass : Command.getStringList(definition, "triggers")) {
+    protected Command(final Benefit benefit, final String name, final Collection<String> dispatch, final Collection<String> undo, final Collection<Trigger> triggers) {
+        this.benefit = benefit;
+        this.name = name;
+        this.dispatch = dispatch;
+        this.undo = undo;
+        this.triggers = triggers;
+    }
+
+    protected void parseTriggers(final ConfigurationSection definition, final List<String> defaults) {
+        for (final String triggerClass : Command.getStringList(definition, "trigger", defaults)) {
             Trigger trigger;
             try {
                 trigger = Trigger.create(triggerClass, this, definition);
             } catch (final Exception e) {
-                this.benefit.pkg.coordinator.plugin.getLogger().log(Level.WARNING, "Failed to create Trigger: {0}; {1}", new Object[] { triggerClass, e });
+                this.getCoordinator().plugin.getLogger().log(Level.WARNING, "Failed to create Trigger: {0}; {1}; Command: {2}", new Object[] { triggerClass, e, this });
                 continue;
             }
             this.triggers.add(trigger);
@@ -44,21 +58,26 @@ public final class Command {
         this.triggers.clear();
     }
 
-    public void add(final Donation donation) {
+    public void assign(final Donation donation) {
+        this.getCoordinator().plugin.getLogger().log(( this.getCoordinator().isSandbox() ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox]}  {0,choice,0#Assign|1#Applicable}: {2}"
+                , new Object[] { this.getCoordinator().isSandbox()?1:0, this.benefit.pkg, this });
+
+        if (this.getCoordinator().isSandbox()) return;
+
         for (final Trigger trigger : this.triggers) {
-            this.getCoordinator().plugin.getLogger().log(Level.FINEST, "  Trigger added for {0} to {1}", new Object[] { donation.getKey(), trigger.getPath() });
+            this.getCoordinator().plugin.getLogger().log(Level.FINEST, "    Trigger added for {0} to {1}", new Object[] { donation.getKey(), trigger.getPath() });
             trigger.add(donation);
         }
     }
 
     public boolean dispatch(final Donation donation) {
-        if (!this.remove(donation)) return false;
+        if (!this.unassign(donation)) return false;
         this.execute(donation, this.dispatch);
         return true;
     }
 
     public boolean undo(final Donation donation) {
-        if (!this.remove(donation)) return false;
+        if (!this.unassign(donation)) return false;
         this.execute(donation, this.undo);
         return true;
     }
@@ -79,7 +98,7 @@ public final class Command {
         this.getCoordinator().savePending();
     }
 
-    private boolean remove(final Donation donation) {
+    protected boolean unassign(final Donation donation) {
         boolean removed = false;
         for (final Trigger trigger : this.triggers) {
             if (trigger.remove(donation)) removed = true;
@@ -97,19 +116,24 @@ public final class Command {
 
     @Override
     public String toString() {
-        return "Command: [getPath(): " + this.getPath() + "; dispatch:" + this.dispatch + "; triggers: " + this.triggers + "]";
+        return "Command: [getPath(): " + this.getPath() + "; dispatch:" + JoinList.join(this.dispatch, ", ", "\"{0}\"") + "; triggers: " + this.triggers + "]";
     }
 
 
 
-    private static List<String> getStringList(final ConfigurationSection config, final String path) {
+    protected static List<String> getStringList(final ConfigurationSection config, final String path) {
+        return Command.getStringList(config, path, Collections.<String>emptyList());
+    }
+
+
+    protected static List<String> getStringList(final ConfigurationSection config, final String path, final List<String> defaults) {
         if (config.isList(path))
             return config.getStringList(path);
 
         if (config.isString(path))
             return Arrays.asList(config.getString(path));
 
-        return Collections.emptyList();
+        return defaults;
     }
 
 }

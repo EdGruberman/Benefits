@@ -1,6 +1,8 @@
 package edgruberman.bukkit.donations;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -11,19 +13,24 @@ public final class Benefit {
     public final Package pkg;
     public final String name;
     public final String description;
-    public final Integer limit;
     public final Map<String, Command> commands = new LinkedHashMap<String, Command>();
 
     Benefit(final Package pkg, final ConfigurationSection definition) {
         this.pkg = pkg;
         this.name = definition.getName();
         this.description = definition.getString("description");
-        this.limit = definition.getInt("limit");
 
         final ConfigurationSection commands = definition.getConfigurationSection("commands");
-        if (commands == null) return;
-        for (final String commandName : commands.getKeys(false)) {
-            final Command command = new Command(this, commands.getConfigurationSection(commandName));
+        if (commands != null) {
+            for (final String commandName : commands.getKeys(false)) {
+                final Command command = new Command(this, commands.getConfigurationSection(commandName));
+                this.commands.put(command.name.toLowerCase(), command);
+            }
+        }
+
+        final ConfigurationSection expiration = definition.getConfigurationSection("expiration");
+        if (expiration != null) {
+            final Command command = new Expiration(this, expiration);
             this.commands.put(command.name.toLowerCase(), command);
         }
     }
@@ -31,6 +38,15 @@ public final class Benefit {
     void clear() {
         for (final Command command : this.commands.values()) command.clear();
         this.commands.clear();
+    }
+
+    public List<Command> assign(final Donation donation) {
+        final List<Command> result = new ArrayList<Command>();
+        for (final Command command : this.commands.values()) {
+            command.assign(donation);
+            result.add(command);
+        }
+        return result;
     }
 
     public String getPath() {

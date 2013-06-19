@@ -1,7 +1,9 @@
 package edgruberman.bukkit.donations;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -10,6 +12,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 /** collection of Benefits */
 public final class Package {
+
+    private static final long DEFAULT_MINIMUM = -1; // no minimum
+    private static final long DEFAULT_LIMIT = -1; // no limit
 
     private static final long LIMIT_TOLERANCE = 1000 * 60 * 60 * 12; // milliseconds of 12 hours
 
@@ -21,7 +26,7 @@ public final class Package {
     public long minimum;
 
     /** days before package can be applied for a new donation */
-    public Integer limit;
+    public long limit;
 
     /** benefits index keyed on lower case benefit name */
     public Map<String, Benefit> benefits = new LinkedHashMap<String, Benefit>();
@@ -30,8 +35,8 @@ public final class Package {
         this.coordinator = coordinator;
         this.name = definition.getName();
         this.description = definition.getString("description");
-        this.minimum = definition.getLong("minimum");
-        this.limit = definition.getInt("limit");
+        this.minimum = definition.getLong("minimum", Package.DEFAULT_MINIMUM);
+        this.limit = definition.getLong("limit", Package.DEFAULT_LIMIT);
 
         final ConfigurationSection benefits = definition.getConfigurationSection("benefits");
         for (final String benefitName : benefits.getKeys(false)) {
@@ -58,7 +63,7 @@ public final class Package {
         if (donation.amount < this.minimum) return false;
 
         // package is not applicable if last time package was applied is less than limit + tolerance
-        if (this.limit == null) return true;
+        if (this.limit <= 0) return true;
         final Long last = this.coordinator.last(this, donation.player);
         if (last == null) return true;
 
@@ -69,6 +74,15 @@ public final class Package {
         }
 
         return true;
+    }
+
+    public List<Command> assign(final Donation donation) {
+        final List<Command> result = new ArrayList<Command>();
+        for (final Benefit benefit : this.benefits.values()) {
+            final List<Command> assigned = benefit.assign(donation);
+            result.addAll(assigned);
+        }
+        return result;
     }
 
 

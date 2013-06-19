@@ -2,6 +2,7 @@ package edgruberman.bukkit.donations;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -61,7 +62,7 @@ public abstract class Trigger {
     public void clear() {};
 
     public String getName() {
-        return (this.getClass().getPackage().equals(Trigger.class.getPackage()) ? this.getClass().getSimpleName() : this.getClass().getName());
+        return (this.getClass().getPackage().getName().equals(Trigger.DEFAULT_PACKAGE) ? this.getClass().getSimpleName() : this.getClass().getName());
     }
 
     public String getPath() {
@@ -70,11 +71,11 @@ public abstract class Trigger {
 
     @Override
     public String toString() {
-        return this.toString("");
+        return this.toString(null);
     }
 
     protected String toString(final String custom) {
-        return String.format("Trigger (%1$s): [%2$s]", this.getName(), custom);
+        return MessageFormat.format("{0}{1,choice,0#|1#: [{2}]}", this.getName(), ( custom == null ? 0 : 1 ), custom);
     }
 
 }

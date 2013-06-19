@@ -82,6 +82,7 @@ public final class Coordinator {
 
         // do not attempt assignment if player not identified yet
         if (donation.player == null) {
+            this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] }No packages assigned; Player not identified for origin: {1}", new Object[] { this.sandbox?1:0, donation.origin });
             if (!this.sandbox) ((Main) this.plugin).saveDonation(donation);
             return;
         }
@@ -89,13 +90,7 @@ public final class Coordinator {
         donation.packages = new ArrayList<String>();
         for (final Package pkg : this.applicable(donation)) {
             if (!this.sandbox) donation.packages.add(pkg.name);
-            for (final Benefit benefit : pkg.benefits.values()) {
-                for (final Command command : benefit.commands.values()) {
-                    if (!this.sandbox) command.add(donation);
-                    this.plugin.getLogger().log(( this.sandbox ? Level.INFO : Level.FINEST ), "{0,choice,1#|[Sandbox] }   {0,choice,0#Assigned|1#Applicable}: {2}"
-                            , new Object[] { this.sandbox?1:0, pkg, command });
-                }
-            }
+            pkg.assign(donation);
         }
 
         if (!this.sandbox) {

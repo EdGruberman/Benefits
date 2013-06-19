@@ -35,7 +35,7 @@ public final class Main extends CustomPlugin {
     @Override
     public void onLoad() {
         this.putConfigMinimum("0.0.0a109");
-        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0a141");
+        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0b4");
     }
 
     @Override
@@ -189,7 +189,7 @@ public final class Main extends CustomPlugin {
                             continue;
                         }
 
-                        command.add(donation);
+                        command.assign(donation);
                     }
                 }
             }
@@ -206,6 +206,7 @@ public final class Main extends CustomPlugin {
                         final List<String> donations = new ArrayList<String>();
                         for (final Donation donation : trigger.getPending()) donations.add(donation.getKey());
                         if (donations.size() > 0) this.pending.set(pkg.name + "." + benefit.name + "." + command.name, donations);
+                        // TODO save expiration commands
                     }
                 }
             }

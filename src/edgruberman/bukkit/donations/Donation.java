@@ -22,7 +22,7 @@ public final class Donation {
     /** source of donation, usually an e-mail address */
     public final String origin;
 
-    /** in-game name of player to apply donation benefits to */
+    /** in-game name of player to apply donation benefits to, null if not registered */
     public final String player;
 
     /** financial denomination of amount */
