@@ -12,8 +12,8 @@ benefits:
   none: '§f-> §7No benefits assigned to package'
   package: '§f-> §7§l{1}§8:§7 §a{5} {3,number,0.00}+§7 §8=§7 {2}{4,choice,0#|1# §8(§e{4}d limit§8)}' # 0 = generated, 1 = package, 2 = description, 3 = minimum, 4 = limit (days), 5 = currency
   instruction:
-    - '§7To list specifics: §b§l/benefits §3§opackage'
-    - '§f-> §8(§7Details at http://mc.rjump.com/about/#Donations§8)'
+    - '§f-> §7To list specifics: §b§l/benefits §3§opackage'
+    - '§f-> §7Details at http://mc.rjump.com/about/#Donations'
   benefit: '§f-> §7§l{1} §8>§7 §l{2}§8:§7 {3}' # 0 = generated, 1 = package, 2 = benefit, 3 = description
 process:
   success: # 0 = generated, 1 = donator, 2 = currency, 3 = amount, 3 = packages

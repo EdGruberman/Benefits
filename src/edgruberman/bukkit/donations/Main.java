@@ -15,7 +15,7 @@ import edgruberman.bukkit.donations.commands.Register;
 import edgruberman.bukkit.donations.commands.Reload;
 import edgruberman.bukkit.donations.commands.Sandbox;
 import edgruberman.bukkit.donations.commands.Undo;
-import edgruberman.bukkit.donations.messaging.ConfigurationCourier;
+import edgruberman.bukkit.donations.messaging.Courier.ConfigurationCourier;
 import edgruberman.bukkit.donations.util.BufferedYamlConfiguration;
 import edgruberman.bukkit.donations.util.CustomPlugin;
 
@@ -35,7 +35,7 @@ public final class Main extends CustomPlugin {
     @Override
     public void onLoad() {
         this.putConfigMinimum("0.0.0a109");
-        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0b4");
+        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0b22");
     }
 
     @Override
