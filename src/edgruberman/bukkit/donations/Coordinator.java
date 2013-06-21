@@ -65,6 +65,7 @@ public final class Coordinator {
 
     public String putRegistration(final String origin, final String player) {
         final String previous = this.registrations.put(origin, player);
+        if (previous != null) ((Main) this.plugin).deleteRegistration(origin, previous);
         ((Main) this.plugin).saveRegistration(origin, player);
 
         for (final Donation donation : this.unassigned(origin)) {

@@ -3,7 +3,6 @@ package edgruberman.bukkit.donations;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -62,7 +61,7 @@ public final class Main extends CustomPlugin {
 
         this.registrations = new BufferedYamlConfiguration(this, new File(this.getDataFolder(), "registrations.yml"), 5000);
         try { this.registrations.load(); } catch (final Exception e) { throw new IllegalStateException("Unable to load registrations.yml file; {0}", e); }
-        this.loadRegistrations(this.registrations.getRoot());
+        this.loadRegistrations(this.registrations);
         this.getLogger().log(Level.CONFIG, "Loaded {0} registration{0,choice,0#s|1#|2#s}", this.coordinator.registrations.size());
 
 
@@ -206,7 +205,6 @@ public final class Main extends CustomPlugin {
                         final List<String> donations = new ArrayList<String>();
                         for (final Donation donation : trigger.getPending()) donations.add(donation.getKey());
                         if (donations.size() > 0) this.pending.set(pkg.name + "." + benefit.name + "." + command.name, donations);
-                        // TODO save expiration commands
                     }
                 }
             }
@@ -216,16 +214,24 @@ public final class Main extends CustomPlugin {
     }
 
     private void loadRegistrations(final ConfigurationSection registrations) {
-        for (final String path : registrations.getKeys(false)) {
-            final ConfigurationSection entry = registrations.getConfigurationSection(path);
-            this.coordinator.registrations.put(entry.getString("origin").toLowerCase(), entry.getString("player"));
+        for (final String player : registrations.getKeys(false)) {
+            for (final String origin : registrations.getStringList(player)) {
+                this.coordinator.registrations.put(origin, player);
+            }
         }
     }
 
     void saveRegistration(final String origin, final String player) {
-        final ConfigurationSection entry = this.registrations.getRoot().createSection(UUID.randomUUID().toString());
-        entry.set("origin", origin);
-        entry.set("player", player);
+        final List<String> origins = this.registrations.getStringList(player);
+        origins.add(origin);
+        this.registrations.set(player, origins);
+        this.registrations.queueSave();
+    }
+
+    void deleteRegistration(final String origin, final String player) {
+        final List<String> origins = this.registrations.getStringList(player);
+        if (!origins.remove(origin)) return;
+        this.registrations.set(player, ( origins.size() >= 1 ? origins : null ));
         this.registrations.queueSave();
     }
 

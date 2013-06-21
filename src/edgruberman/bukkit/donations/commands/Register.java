@@ -1,6 +1,7 @@
 package edgruberman.bukkit.donations.commands;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,7 +36,7 @@ public final class Register implements CommandExecutor {
         Main.courier.send(sender, "register.unassigned.footer", unassigned.size());
         if (player == null) return true;
 
-        final String previous = this.coordinator.putRegistration(origin, player);
+        final String previous = this.coordinator.putRegistration(origin.toLowerCase(Locale.ENGLISH), player.toLowerCase(Locale.ENGLISH));
         Main.courier.send(sender, "register.success", origin, player, previous);
         return true;
     }
