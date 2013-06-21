@@ -8,36 +8,36 @@ commands:
     aliases: [donations, donations.history]
     description: Show donation history
     permission: donations.history
-    usage: '§f-> §7Usage: §b§l/<command> §3[§opage§3] [§odonator§3]'
+    usage: '§f-> §7Usage: §b/<command> §3[§opage§3] [§odonator§3]'
   'donations:benefits':
     aliases: [benefits, donations.benefits]
     description: Show package/benefit detail
     permission: donations.benefits
-    usage: '§f-> §7Usage: §b§l/<command> §3[§opackage§3]'
+    usage: '§f-> §7Usage: §b/<command> §3[§opackage§3]'
   'donations:process':
     aliases: [process, donations.process]
     description: Record and apply a donation
     permission: donations.process
-    usage: '§f-> §7Usage: §b§l/<command> §3§odonator amount §3[§owhen§3]'
+    usage: '§f-> §7Usage: §b/<command> §3§odonator amount §3[§owhen§3]'
   'donations:undo':
     aliases: [undo, donations.undo]
     description: Revert applied package, benefit, or command for donation
     permission: donations.undo
-    usage: '§f-> §7Usage: §b§l/<command> §3§odonation package §3[§obenefit §3[§ocommand§3]]'
+    usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit §3[§ocommand§3]]'
   'donations:sandbox':
     aliases: [sandbox, donations.sandbox]
     description: Toggle sandbox mode on or off
     permission: donations.sandbox
-    usage: '§f-> §7Usage: §b§l/<command> §3[§lon§3|§loff§3]'
+    usage: '§f-> §7Usage: §b/<command> §3[§bon§3|§boff§3]'
   'donations:register':
     aliases: [register, donations.register]
     description: Associate a donation origin (e-mail) with a player
     permission: donations.register
-    usage: '§f-> §7Usage: §b§l/<command> §3§oorigin §3[§oplayer§3]'
+    usage: '§f-> §7Usage: §b/<command> §3§oorigin §3[§oplayer§3]'
   'donations:reload':
     description: Reload Donations plugin
     permission: donations.reload
-    usage: '§f-> §7Usage: §b§l/<command>'
+    usage: '§f-> §7Usage: §b/<command>'
 permissions:
   donations.user:
     description: Can use basic features
