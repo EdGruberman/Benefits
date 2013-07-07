@@ -35,7 +35,7 @@ public final class History implements CommandExecutor {
         final Integer page =  History.parsePage(args);
 
         if (args.length < 2 && !(sender instanceof Player)) {
-            Main.courier.send(sender, "requires-argument", "page player", 0);
+            Main.courier.send(sender, "requires-argument", "page donator", 0);
             return false;
         }
 

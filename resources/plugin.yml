@@ -23,7 +23,7 @@ commands:
     aliases: [undo, donations.undo]
     description: Revert applied package, benefit, or command for donation
     permission: donations.undo
-    usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit §3[§ocommand§3]]'
+    usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit§3]§o §3[§ocommand§3]'
   'donations:sandbox':
     aliases: [sandbox, donations.sandbox]
     description: Toggle sandbox mode on or off
