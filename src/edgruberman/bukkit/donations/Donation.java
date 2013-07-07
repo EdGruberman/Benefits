@@ -82,7 +82,7 @@ public final class Donation {
 
     @Override
     public String toString() {
-        return MessageFormat.format("Donation [processor={0}, id={1}, origin={2}, playerName={3}, currency={4}, amount={5,number,0.00}, contributed={6,date,yyyy MMM dd hh:mm aa}]"
+        return MessageFormat.format("Donation [processor={0}, id={1}, origin={2}, player={3}, currency={4}, amount={5,number,0.00}, contributed={6,date,yyyy MMM dd hh:mm aa}]"
                 , this.processor, this.id, this.origin, this.player, this.currency, this.amount / 100D, this.contributed);
     }
 

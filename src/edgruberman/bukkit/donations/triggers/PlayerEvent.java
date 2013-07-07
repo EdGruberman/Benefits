@@ -83,6 +83,7 @@ public abstract class PlayerEvent extends Trigger implements Listener {
         final List<Donation> donations = this.pending.get(name);
         if (donations == null) return;
 
+        // make a copy to allow for command dispatch to remove donation from trigger during processing
         final List<Donation> copy = new ArrayList<Donation>(donations);
         for (final Donation donation : copy) this.command.dispatch(donation);
     }

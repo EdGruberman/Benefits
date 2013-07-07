@@ -15,12 +15,13 @@ public class Online extends Join {
 
     @Override
     public void add(final Donation donation) {
+        // trigger must be added first as dispatch verifies donation is assigned before dispatching
+        super.add(donation);
+
         if (Bukkit.getServer().getPlayerExact(donation.player) != null) {
             this.command.dispatch(donation);
             return;
         }
-
-        super.add(donation);
     }
 
 }
