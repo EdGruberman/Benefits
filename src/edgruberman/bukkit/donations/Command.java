@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
 import edgruberman.bukkit.donations.triggers.Instant;
@@ -116,7 +117,7 @@ public class Command {
 
     @Override
     public String toString() {
-        return "Command: [getPath(): " + this.getPath() + "; dispatch:" + JoinList.join(this.dispatch, ", ", "\"{0}\"") + "; triggers: " + this.triggers + "]";
+        return "Command: [getPath(): " + this.getPath() + "; dispatch:" + JoinList.join(this.dispatch, ", ", "\"{0}\"" + ChatColor.RESET) + "; triggers: " + this.triggers + "]";
     }
 
 
