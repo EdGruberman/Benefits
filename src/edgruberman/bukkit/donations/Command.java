@@ -84,6 +84,7 @@ public class Command {
     }
 
     private void execute(final Donation donation, final Collection<String> commands) {
+        this.getCoordinator().plugin.getLogger().log(Level.FINEST, "Executing commands for donation: {0}", donation);
         for (final String d : commands) {
             String command;
             try {
@@ -93,7 +94,7 @@ public class Command {
                 continue;
             }
 
-            this.getCoordinator().plugin.getLogger().finest("Executing command: " + command);
+            this.getCoordinator().plugin.getLogger().log(Level.FINEST, "Dispatching command: {0}", command);
             Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
         }
         this.getCoordinator().savePending();
