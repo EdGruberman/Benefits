@@ -13,7 +13,7 @@ import org.bukkit.configuration.ConfigurationSection;
 /** collection of Benefits */
 public final class Package {
 
-    private static final long DEFAULT_MINIMUM = -1; // no minimum
+    private static final Long DEFAULT_MINIMUM = null; // only manually assigned (not automatically based on amount)
     private static final long DEFAULT_LIMIT = -1; // no limit
     private static final boolean DEFAULT_VISIBLE = true;
 
@@ -24,7 +24,7 @@ public final class Package {
     public String description;
 
     /** amount at which package is applicable for a donation */
-    public long minimum;
+    public Long minimum;
 
     /** days before package can be applied for a new donation */
     public long limit;
@@ -63,8 +63,11 @@ public final class Package {
         return this.getPath();
     }
 
-    /** @return true if at least one benefit is associated that is visible */
+    /** @return true when package should be displayed to regular users */
     public boolean visible() {
+        // manually assigned packages are not visible
+        if (this.minimum == null) return false;
+
         // package can override all benefits for visibility
         if (!this.visible) return false;
 
@@ -78,7 +81,7 @@ public final class Package {
     }
 
     public boolean applicable(final Donation donation) {
-        if (donation.amount < this.minimum) return false;
+        if (this.minimum == null || this.minimum > donation.amount) return false;
 
         // package is not applicable if last time package was applied is less than limit + tolerance
         if (this.limit <= 0) return true;
@@ -111,7 +114,10 @@ public final class Package {
 
         @Override
         public int compare(final Package x, final Package y) {
-            return Long.valueOf(x.minimum).compareTo(Long.valueOf(y.minimum));
+            if (x.minimum == null && y.minimum == null) return 0;
+            if (x.minimum == null) return -1;
+            if (y.minimum == null) return 1;
+            return x.minimum.compareTo(y.minimum);
         }
 
     }

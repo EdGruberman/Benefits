@@ -21,8 +21,13 @@ commands:
     usage: '§f-> §7Usage: §b/<command> §3§odonator amount §3[§owhen§3]'
   'donations:undo':
     aliases: [undo, donations.undo]
-    description: Revert applied package, benefit, or command for donation
+    description: Revert applied package, benefit, or command from donation
     permission: donations.undo
+    usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit§3]§o §3[§ocommand§3]'
+  'donations:assign':
+    aliases: [assign, donations.assign]
+    description: Manually assign package, benefit, or command to donation
+    permission: donations.assign
     usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit§3]§o §3[§ocommand§3]'
   'donations:sandbox':
     aliases: [sandbox, donations.sandbox]
@@ -52,6 +57,7 @@ permissions:
       donations.user: true
       donations.process: true
       donations.undo: true
+      donations.assign: true
       donations.sandbox: true
       donations.register: true
       donations.reload: true
@@ -66,6 +72,9 @@ permissions:
     default: false
   donations.undo:
     description: Can use undo command
+    default: false
+  donations.assign:
+    description: Can use assign command
     default: false
   donations.sandbox:
     description: Can use sandbox command

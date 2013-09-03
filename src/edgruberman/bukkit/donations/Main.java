@@ -34,7 +34,7 @@ public final class Main extends CustomPlugin {
     @Override
     public void onLoad() {
         this.putConfigMinimum("0.0.0a109");
-        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0b22");
+        this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0b37");
     }
 
     @Override

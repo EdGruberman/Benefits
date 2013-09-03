@@ -24,8 +24,15 @@ process:
     delimiter: '§8,§7 '
 undo:
   success: # 0 = generated, 1 = donator, 2 = currency, 3 = amount, 4 = contributed, 5 = commands
-    - '§f-> §2Reverted §7benefits from §f{1} §7assigned for §a{2} {3,number,0.00}§7 on {4,date,yyyy MMM dd hh:mm aa}'
+    - '§f-> §2Reverted §7commands from §f{1} §7assigned for §a{2} {3,number,0.00}§7 on {4,date,yyyy MMM dd hh:mm aa}'
     - '§f-> §7Commands undone§8:§7 {5}'
+  commands:
+    item: '{0}' # 0 = Command
+    delimiter: '§8,§7 '
+assign:
+  success:  # 0 = generated, 1 = donator, 2 = currency, 3 = amount, 4 = contributed, 5 = commands
+    - '§f-> §2Assigned §7commands to §f{1} §7for §a{2} {3,number,0.00}§7 on {4,date,yyyy MMM dd hh:mm aa}'
+    - '§f-> §7Commands assigned§8:§7 {5}'
   commands:
     item: '{0}' # 0 = Command
     delimiter: '§8,§7 '
