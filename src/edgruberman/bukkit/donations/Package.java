@@ -15,6 +15,7 @@ public final class Package {
 
     private static final long DEFAULT_MINIMUM = -1; // no minimum
     private static final long DEFAULT_LIMIT = -1; // no limit
+    private static final boolean DEFAULT_VISIBLE = true;
 
     private static final long LIMIT_TOLERANCE = 1000 * 60 * 60 * 12; // milliseconds of 12 hours
 
@@ -28,6 +29,8 @@ public final class Package {
     /** days before package can be applied for a new donation */
     public long limit;
 
+    public boolean visible;
+
     /** benefits index keyed on lower case benefit name */
     public Map<String, Benefit> benefits = new LinkedHashMap<String, Benefit>();
 
@@ -37,6 +40,7 @@ public final class Package {
         this.description = definition.getString("description");
         this.minimum = definition.getLong("minimum", Package.DEFAULT_MINIMUM);
         this.limit = definition.getLong("limit", Package.DEFAULT_LIMIT);
+        this.visible = definition.getBoolean("visible", Package.DEFAULT_VISIBLE);
 
         final ConfigurationSection benefits = definition.getConfigurationSection("benefits");
         for (final String benefitName : benefits.getKeys(false)) {
@@ -57,6 +61,20 @@ public final class Package {
     @Override
     public String toString() {
         return this.getPath();
+    }
+
+    /** @return true if at least one benefit is associated that is visible */
+    public boolean visible() {
+        // package can override all benefits for visibility
+        if (!this.visible) return false;
+
+        // any single benefit being visible makes package visible
+        for (final Benefit benefit : this.benefits.values()) {
+            if (benefit.visible) return true;
+        }
+
+        // empty packages and packages with only hidden benefits are not visible
+        return false;
     }
 
     public boolean applicable(final Donation donation) {

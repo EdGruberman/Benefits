@@ -38,16 +38,18 @@ public final class Benefits extends Executor {
             return true;
         }
 
-        final Package pkg = this.coordinator.packages.get(args.get(0).toLowerCase());
-        if (pkg == null || pkg.benefits.size() == 0) {
+        final Package pkg = this.coordinator.getPackage(args.get(0).toLowerCase());
+        if (pkg == null || !pkg.visible()) {
             Main.courier.send(sender, "benefits.none");
             return true;
         }
 
         // Donor: Confirmation = Notification regarding a received donation
         // Donor: Resurrection = Extra life after death
-        for (final Benefit benefit : pkg.benefits.values())
+        for (final Benefit benefit : pkg.benefits.values()) {
+            if (!benefit.visible) continue;
             Main.courier.send(sender, "benefits.benefit", pkg.name, benefit.name, benefit.description);
+        }
 
         return true;
     }

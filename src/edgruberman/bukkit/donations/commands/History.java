@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import edgruberman.bukkit.donations.Coordinator;
 import edgruberman.bukkit.donations.Donation;
 import edgruberman.bukkit.donations.Main;
+import edgruberman.bukkit.donations.Package;
 import edgruberman.bukkit.donations.util.JoinList;
 
 public final class History implements CommandExecutor {
@@ -51,7 +52,13 @@ public final class History implements CommandExecutor {
         final int last = Math.min(first + this.pageSize, history.size());
         final long now = System.currentTimeMillis();
         for (final Donation donation : history.subList(first, last)) {
-            final List<String> packages = new JoinList<String>(Main.courier.getSection("history.packages"), donation.packages);
+            final List<String> packages = new JoinList<String>(Main.courier.getSection("history.packages"));
+            for (final String name : donation.packages) {
+                final Package pkg = this.coordinator.getPackage(name);
+                if (pkg != null && !pkg.visible()) continue;
+                packages.add(name);
+            }
+
             final long days = TimeUnit.MILLISECONDS.toDays(now - donation.contributed);
             Main.courier.send(sender, "history.donation", new Date(donation.contributed), days, donation.currency, donation.amount / 100D, packages);
         }

@@ -10,15 +10,19 @@ import org.bukkit.configuration.ConfigurationSection;
 /** collection of commands */
 public final class Benefit {
 
+    private static final boolean DEFAULT_VISIBLE = true;
+
     public final Package pkg;
     public final String name;
     public final String description;
+    public final boolean visible;
     public final Map<String, Command> commands = new LinkedHashMap<String, Command>();
 
     Benefit(final Package pkg, final ConfigurationSection definition) {
         this.pkg = pkg;
         this.name = definition.getName();
         this.description = definition.getString("description");
+        this.visible = definition.getBoolean("visible", Benefit.DEFAULT_VISIBLE);
 
         final ConfigurationSection commands = definition.getConfigurationSection("commands");
         if (commands != null) {
