@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -78,7 +78,7 @@ public abstract class PlayerEvent extends Trigger implements Listener {
         return removed;
     }
 
-    protected void apply(final Player player) {
+    protected void apply(final OfflinePlayer player) {
         final String name = player.getName().toLowerCase();
         final List<Donation> donations = this.pending.get(name);
         if (donations == null) return;

@@ -2,11 +2,13 @@ package edgruberman.bukkit.donations;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 
 /** manages benefit distribution */
@@ -87,6 +89,10 @@ public final class Coordinator {
             if (!this.sandbox) ((Main) this.plugin).saveDonation(donation);
             return;
         }
+
+        final OfflinePlayer contributor = this.plugin.getServer().getOfflinePlayer(donation.player);
+        final ContributionEvent event = new ContributionEvent(contributor, new Date(donation.contributed), donation.currency, donation.amount);
+        this.plugin.getServer().getPluginManager().callEvent(event);
 
         donation.packages = new ArrayList<String>();
         for (final Package pkg : this.applicable(donation)) {
