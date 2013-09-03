@@ -23,7 +23,7 @@ public final class Package {
     public String name;
     public String description;
 
-    /** amount at which package is applicable for a donation */
+    /** amount at which package is automatically applicable for a donation; null if only manually assigned */
     public Long minimum;
 
     /** days before package can be applied for a new donation */
@@ -38,7 +38,7 @@ public final class Package {
         this.coordinator = coordinator;
         this.name = definition.getName();
         this.description = definition.getString("description");
-        this.minimum = definition.getLong("minimum", Package.DEFAULT_MINIMUM);
+        this.minimum = ( definition.isSet("minimum") ? (Long) definition.getLong("minimum") : Package.DEFAULT_MINIMUM );
         this.limit = definition.getLong("limit", Package.DEFAULT_LIMIT);
         this.visible = definition.getBoolean("visible", Package.DEFAULT_VISIBLE);
 
