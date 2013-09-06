@@ -39,14 +39,14 @@ public final class Process implements CommandExecutor {
         final String donator = args[0];
         final Double amount = Process.parseDouble(args[1]);
         if (amount == null) {
-            Main.courier.send(sender, "unknown-argument", "amount", false, args[1]);
+            Main.courier.send(sender, "unknown-argument", "amount", 0, args[1]);
             return false;
         }
         final long converted = (long) (amount * 100);
 
         final Date when = (args.length >= 3 ? Process.parseDate(args[2]) : new Date());
         if (when == null) {
-            Main.courier.send(sender, "unknown-argument", "when", false, args[2]);
+            Main.courier.send(sender, "unknown-argument", "when", 0, args[2]);
             return false;
         }
 

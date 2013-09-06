@@ -33,7 +33,7 @@ public final class Undo extends Executor {
 
         final Donation donation = this.coordinator.getDonation(args.get(0));
         if (donation == null) {
-            Main.courier.send(sender, "unknown-argument", "donation", false, args.get(0));
+            Main.courier.send(sender, "unknown-argument", "donation", 0, args.get(0));
             return false;
         }
 
@@ -44,7 +44,7 @@ public final class Undo extends Executor {
 
         final Package pkg = this.coordinator.packages.get(args.get(1).toLowerCase());
         if (pkg == null) {
-            Main.courier.send(sender, "unknown-argument", "package", false, args.get(1));
+            Main.courier.send(sender, "unknown-argument", "package", 0, args.get(1));
             return false;
         }
 
@@ -52,7 +52,7 @@ public final class Undo extends Executor {
         if (args.size() >= 3) {
             benefit = pkg.benefits.get(args.get(2).toLowerCase());
             if (benefit == null) {
-                Main.courier.send(sender, "unknown-argument", "benefit", false, args.get(2));
+                Main.courier.send(sender, "unknown-argument", "benefit", 0, args.get(2));
                 return false;
             }
         }
@@ -61,7 +61,7 @@ public final class Undo extends Executor {
         if (args.size() >= 4) {
             cmd = benefit.commands.get(args.get(3).toLowerCase());
             if (cmd == null) {
-                Main.courier.send(sender, "unknown-argument", "command", false, args.get(3));
+                Main.courier.send(sender, "unknown-argument", "command", 0, args.get(3));
                 return false;
             }
         }
