@@ -1,5 +1,5 @@
 log-level: ALL
-currency: USD # if this is changed after receiving donations, donations.yml and pending.yml must be manually cleaned out
+currency: USD # if this is changed after receiving contributions, contributions.yml and pending.yml must be manually cleaned out
 processors:
   PayPal:
     enable: true

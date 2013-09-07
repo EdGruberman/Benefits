@@ -1,87 +1,87 @@
-name: Donations
+name: Benefits
 version: @VERSION@
-description: Manages donation benefits
+description: Manages player benefits for contributions
 author: EdGruberman (ed@rjump.com)
-main: edgruberman.bukkit.donations.Main
+main: edgruberman.bukkit.benefits.Main
 commands:
-  'donations:history':
-    aliases: [donations, donations.history]
-    description: Show donation history
-    permission: donations.history
-    usage: '§f-> §7Usage: §b/<command> §3[§opage§3] [§odonator§3]'
-  'donations:benefits':
-    aliases: [benefits, donations.benefits]
+  'benefits:contributions':
+    aliases: [contributions, benefits.contributions]
+    description: Show contribution history
+    permission: benefits.history
+    usage: '§f-> §7Usage: §b/<command> §3[§opage§3] [§ocontributor§3]'
+  'benefits:benefits':
+    aliases: [benefits]
     description: Show package/benefit detail
-    permission: donations.benefits
+    permission: benefits.benefits
     usage: '§f-> §7Usage: §b/<command> §3[§opackage§3]'
-  'donations:process':
-    aliases: [process, donations.process]
-    description: Record and apply a donation
-    permission: donations.process
-    usage: '§f-> §7Usage: §b/<command> §3§odonator amount §3[§owhen§3]'
-  'donations:undo':
-    aliases: [undo, donations.undo]
-    description: Revert applied package, benefit, or command from donation
-    permission: donations.undo
-    usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit§3]§o §3[§ocommand§3]'
-  'donations:assign':
-    aliases: [assign, donations.assign]
-    description: Manually assign package, benefit, or command to donation
-    permission: donations.assign
-    usage: '§f-> §7Usage: §b/<command> §3§odonation package §3[§obenefit§3]§o §3[§ocommand§3]'
-  'donations:sandbox':
-    aliases: [sandbox, donations.sandbox]
+  'benefits:process':
+    aliases: [process, benefits.process]
+    description: Record and apply a contribution
+    permission: benefits.process
+    usage: '§f-> §7Usage: §b/<command> §3§ocontributor amount §3[§owhen§3]'
+  'benefits:undo':
+    aliases: [undo, benefits.undo]
+    description: Revert applied package, benefit, or command from contribution
+    permission: benefits.undo
+    usage: '§f-> §7Usage: §b/<command> §3§ocontribution package §3[§obenefit§3]§o §3[§ocommand§3]'
+  'benefits:assign':
+    aliases: [assign, benefits.assign]
+    description: Manually assign package, benefit, or command tocontributionn
+    permission: benefits.assign
+    usage: '§f-> §7Usage: §b/<command> §3§ocontribution package §3[§obenefit§3]§o §3[§ocommand§3]'
+  'benefits:sandbox':
+    aliases: [sandbox, benefits.sandbox]
     description: Toggle sandbox mode on or off
-    permission: donations.sandbox
+    permission: benefits.sandbox
     usage: '§f-> §7Usage: §b/<command> §3[§bon§3|§boff§3]'
-  'donations:register':
-    aliases: [register, donations.register]
-    description: Associate a donation origin (e-mail) with a player
-    permission: donations.register
+  'benefits:register':
+    aliases: [register, benefits.register]
+    description: Associate a contribution origin (e-mail) with a player
+    permission: benefits.register
     usage: '§f-> §7Usage: §b/<command> §3§oorigin §3[§oplayer§3]'
-  'donations:reload':
-    description: Reload Donations plugin
-    permission: donations.reload
+  'benefits:reload':
+    description: Reload Benefits plugin
+    permission: benefits.reload
     usage: '§f-> §7Usage: §b/<command>'
 permissions:
-  donations.user:
+  benefits.user:
     description: Can use basic features
     default: true
     children:
-      donations.history: true
-      donations.benefits: true
-  donations.admin:
+      benefits.history: true
+      benefits.benefits: true
+  benefits.admin:
     description: Can use all features
     default: op
     children:
-      donations.user: true
-      donations.process: true
-      donations.undo: true
-      donations.assign: true
-      donations.sandbox: true
-      donations.register: true
-      donations.reload: true
-  donations.history:
+      benefits.user: true
+      benefits.process: true
+      benefits.undo: true
+      benefits.assign: true
+      benefits.sandbox: true
+      benefits.register: true
+      benefits.reload: true
+  benefits.history:
     description: Can use history command
     default: false
-  donations.benefits:
+  benefits.benefits:
     description: Can use benefits command
     default: false
-  donations.process:
+  benefits.process:
     description: Can use process command
     default: false
-  donations.undo:
+  benefits.undo:
     description: Can use undo command
     default: false
-  donations.assign:
+  benefits.assign:
     description: Can use assign command
     default: false
-  donations.sandbox:
+  benefits.sandbox:
     description: Can use sandbox command
     default: false
-  donations.register:
+  benefits.register:
     description: Can use register command
     default: false
-  donations.reload:
+  benefits.reload:
     description: Can use reload command
     default: false
