@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import edgruberman.bukkit.benefits.commands.Assign;
 import edgruberman.bukkit.benefits.commands.Benefits;
 import edgruberman.bukkit.benefits.commands.Contributions;
 import edgruberman.bukkit.benefits.commands.Process;
@@ -88,6 +89,7 @@ public final class Main extends CustomPlugin {
         this.getCommand("benefits:contributions").setExecutor(new Contributions(this.coordinator));
         this.getCommand("benefits:benefits").setExecutor(new Benefits(this.coordinator));
         this.getCommand("benefits:process").setExecutor(new Process(this.coordinator));
+        this.getCommand("benefits:assign").setExecutor(new Assign(this.coordinator));
         this.getCommand("benefits:undo").setExecutor(new Undo(this.coordinator));
         this.getCommand("benefits:sandbox").setExecutor(new Sandbox(this.coordinator));
         this.getCommand("benefits:register").setExecutor(new Register(this.coordinator));

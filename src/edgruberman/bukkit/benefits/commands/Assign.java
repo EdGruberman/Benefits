@@ -88,7 +88,6 @@ public final class Assign extends Executor {
                 , new JoinList<String>(Main.courier.getSection("assign.commands"), assigned));
 
         return true;
-
     }
 
 }
