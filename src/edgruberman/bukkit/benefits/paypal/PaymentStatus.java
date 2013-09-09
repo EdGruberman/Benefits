@@ -1,4 +1,4 @@
-package edgruberman.bukkit.benefits.processors.paypal;
+package edgruberman.bukkit.benefits.paypal;
 
 import java.util.HashMap;
 import java.util.Map;

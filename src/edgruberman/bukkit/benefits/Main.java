@@ -19,6 +19,7 @@ import edgruberman.bukkit.benefits.commands.Reload;
 import edgruberman.bukkit.benefits.commands.Sandbox;
 import edgruberman.bukkit.benefits.commands.Undo;
 import edgruberman.bukkit.benefits.messaging.Courier.ConfigurationCourier;
+import edgruberman.bukkit.benefits.paypal.PayPalProcessor;
 import edgruberman.bukkit.benefits.util.BufferedYamlConfiguration;
 import edgruberman.bukkit.benefits.util.CustomPlugin;
 
@@ -38,7 +39,7 @@ public final class Main extends CustomPlugin {
 
     @Override
     public void onLoad() {
-        this.putConfigMinimum("0.0.0a109");
+        this.putConfigMinimum("0.0.0b51");
         this.putConfigMinimum(Main.LANGUAGE_FILE, "0.0.0b37");
     }
 
@@ -70,24 +71,12 @@ public final class Main extends CustomPlugin {
         this.getLogger().log(Level.CONFIG, "Loaded {0} registration{0,choice,0#s|1#|2#s}", this.coordinator.registrations.size());
 
 
-        // payment processors
-        final ConfigurationSection processorsConfig = this.getConfig().getConfigurationSection("processors");
-        for (final String key : processorsConfig.getKeys(false)) {
-            final ConfigurationSection config = processorsConfig.getConfigurationSection(key);
-            if (!config.getBoolean("enable")) continue;
-
-            final String processorClass = config.getString("class", key);
-            final Processor processor;
-            try {
-                processor = Processor.create(processorClass, this.coordinator, config);
-            } catch (final Exception e) {
-                this.getLogger().log(Level.WARNING, "Failed to create Processor: {0}; {1}; {2}; {3}", new Object[] { processorClass, e, e.getCause(), ( e.getCause() != null ? e.getCause().getCause() : null ) });
-                this.getLogger().log(Level.FINE, "", e);
-                continue;
-            }
-            this.processors.add(processor);
+        // PayPal processor
+        final ConfigurationSection configPayPal = this.getConfig().getConfigurationSection("PayPal");
+        if (configPayPal.getBoolean("enabled")) {
+            final Processor paypal = new PayPalProcessor(this.coordinator, configPayPal);
+            this.processors.add(paypal);
         }
-
 
         // commands
         this.getCommand("benefits:contributions").setExecutor(new Contributions(this.coordinator));

@@ -1,4 +1,4 @@
-package edgruberman.bukkit.benefits.processors.paypal;
+package edgruberman.bukkit.benefits.paypal;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

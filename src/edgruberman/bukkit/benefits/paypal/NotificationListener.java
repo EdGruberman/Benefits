@@ -1,4 +1,4 @@
-package edgruberman.bukkit.benefits.processors.paypal;
+package edgruberman.bukkit.benefits.paypal;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -23,8 +23,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import edgruberman.bukkit.benefits.processors.PayPal;
-import edgruberman.bukkit.benefits.processors.paypal.InstantPaymentNotification.Variable;
+import edgruberman.bukkit.benefits.paypal.InstantPaymentNotification.Variable;
 import edgruberman.bukkit.benefits.util.SynchronousPluginLogger;
 
 /**
@@ -38,7 +37,7 @@ public class NotificationListener implements HttpHandler, Runnable {
     private static final int MEDIAN = 1024; // length in bytes of typical IPN content
     private static final int LIMIT = 16384; // length in bytes of largest IPN request body before ignoring
 
-    private final PayPal processor;
+    private final PayPalProcessor processor;
     private final Plugin plugin;
     private final Logger logger;
 
@@ -57,7 +56,7 @@ public class NotificationListener implements HttpHandler, Runnable {
      * @throws MalformedURLException if validator is an invalid address
      * @throws IOException for any exception while attempting to create HTTP server
      */
-    public NotificationListener(final PayPal processor, final Plugin plugin, final String validator, final InetSocketAddress bind, final List<String> whitelist)
+    public NotificationListener(final PayPalProcessor processor, final Plugin plugin, final String validator, final InetSocketAddress bind, final List<String> whitelist)
             throws UnknownHostException, MalformedURLException, IOException {
         this.processor = processor;
         this.plugin = plugin;

@@ -4,23 +4,25 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 
 import edgruberman.bukkit.benefits.Contribution;
 import edgruberman.bukkit.benefits.Coordinator;
 import edgruberman.bukkit.benefits.Main;
-import edgruberman.bukkit.benefits.processors.SlashCommand;
+import edgruberman.bukkit.benefits.Processor;
 import edgruberman.bukkit.benefits.util.JoinList;
 
 public final class Process implements CommandExecutor {
 
-    SlashCommand processor;
+    private final SlashProcessor processor;
 
     public Process(final Coordinator coordinator) {
-        this.processor = new SlashCommand(coordinator, null);
+        this.processor = new SlashProcessor(coordinator, null);
     }
 
     // usage: /<command> <Contributor> <Amount>[ <When>]
@@ -64,6 +66,22 @@ public final class Process implements CommandExecutor {
     private static Date parseDate(final String s) {
         try { return (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz")).parse(s);
         } catch (final ParseException e) { return null; }
+    }
+
+
+
+
+
+    private static class SlashProcessor extends Processor {
+
+        public SlashProcessor(final Coordinator coordinator, final ConfigurationSection config) {
+            super(coordinator, config);
+        }
+
+        public Contribution process(final String origin, final String player, final long amount, final long contributed) {
+            return this.process(UUID.randomUUID().toString(), origin, player, this.coordinator.currency, amount, contributed);
+        }
+
     }
 
 }

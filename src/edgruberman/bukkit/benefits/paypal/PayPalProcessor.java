@@ -1,4 +1,4 @@
-package edgruberman.bukkit.benefits.processors;
+package edgruberman.bukkit.benefits.paypal;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -12,16 +12,12 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import edgruberman.bukkit.benefits.Coordinator;
 import edgruberman.bukkit.benefits.Contribution;
+import edgruberman.bukkit.benefits.Coordinator;
 import edgruberman.bukkit.benefits.Processor;
-import edgruberman.bukkit.benefits.processors.paypal.InstantPaymentNotification;
-import edgruberman.bukkit.benefits.processors.paypal.NotificationListener;
-import edgruberman.bukkit.benefits.processors.paypal.PaymentStatus;
-import edgruberman.bukkit.benefits.processors.paypal.TransactionType;
-import edgruberman.bukkit.benefits.processors.paypal.InstantPaymentNotification.Variable;
+import edgruberman.bukkit.benefits.paypal.InstantPaymentNotification.Variable;
 
-public class PayPal extends Processor {
+public class PayPalProcessor extends Processor {
 
     private static final List<TransactionType> SUPPORTED_TRANSACTIONS = Arrays.asList(TransactionType.WEB_ACCEPT, TransactionType.SUBSCRIPTION_PAYMENT, TransactionType.SEND_MONEY);
 
@@ -29,7 +25,7 @@ public class PayPal extends Processor {
     private final String currency;
     private final NotificationListener listener;
 
-    public PayPal(final Coordinator coordinator, final ConfigurationSection config) {
+    public PayPalProcessor(final Coordinator coordinator, final ConfigurationSection config) {
         super(coordinator, config);
         this.email = config.getString("email").toLowerCase();
         this.currency = this.coordinator.currency.toLowerCase();
@@ -81,7 +77,7 @@ public class PayPal extends Processor {
 
     private void inspect(final InstantPaymentNotification ipn) {
         final TransactionType type = ipn.parseTransactionType();
-        if (!PayPal.SUPPORTED_TRANSACTIONS.contains(type))
+        if (!PayPalProcessor.SUPPORTED_TRANSACTIONS.contains(type))
             throw new IllegalStateException(MessageFormat.format("Unsupported transaction ({0})", ipn.getValue(Variable.TRANSACTION_TYPE)));
 
         final PaymentStatus status = ipn.parsePaymentStatus();
