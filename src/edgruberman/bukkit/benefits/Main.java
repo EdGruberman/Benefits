@@ -1,7 +1,10 @@
 package edgruberman.bukkit.benefits;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -21,6 +24,7 @@ import edgruberman.bukkit.benefits.util.CustomPlugin;
 
 public final class Main extends CustomPlugin {
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
     private static final String PACKAGES_FILE = "packages.yml";
     private static final String LANGUAGE_FILE = "language.yml";
 
@@ -132,8 +136,15 @@ public final class Main extends CustomPlugin {
                 continue;
             }
 
+            long contributed;
+            try {
+                contributed = Main.DATE_FORMAT.parse(entry.getString("contributed")).getTime();
+            } catch (final ParseException e) {
+                throw new IllegalStateException(e);
+            }
+
             final Contribution contribution = new Contribution(entry.getString("processor"), entry.getString("id"), entry.getString("origin")
-                    , entry.getString("player"), currency, entry.getLong("amount"), entry.getLong("contributed"), ( entry.isSet("packages") ? entry.getStringList("packages") : null ));
+                    , entry.getString("player"), currency, entry.getLong("amount"), contributed, ( entry.isSet("packages") ? entry.getStringList("packages") : null ));
 
             final Contribution duplicate = this.coordinator.putContribution(contribution);
             if (duplicate != null) this.getLogger().log(Level.WARNING, "Unable to load duplicate contribution from contributions.yml; {0}", duplicate);
@@ -151,7 +162,7 @@ public final class Main extends CustomPlugin {
         entry.set("player", contribution.player);
         entry.set("currency", contribution.currency);
         entry.set("amount", contribution.amount);
-        entry.set("contributed", contribution.contributed);
+        entry.set("contributed", Main.DATE_FORMAT.format(new Date(contribution.contributed)));
         entry.set("packages", contribution.packages);
         this.contributions.queueSave();
     }
