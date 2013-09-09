@@ -13,7 +13,7 @@ public class ContributionEvent extends Event {
     private final String currency;
     private final long amount;
 
-    ContributionEvent (final OfflinePlayer contributor, final Date contributed, final String currency, final long amount) {
+    ContributionEvent(final OfflinePlayer contributor, final Date contributed, final String currency, final long amount) {
         this.contributor = contributor;
         this.contributed = contributed;
         this.currency = currency;
